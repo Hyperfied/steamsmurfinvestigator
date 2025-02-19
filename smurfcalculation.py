@@ -29,6 +29,16 @@ def score_total_playtime(hours: float):
     
     return score
 
+def score_last_2_weeks_versus_average(last2Weeks: float, average2Weeks: float):
+    percentage = (last2Weeks/average2Weeks) * 100
+    
+    score = 167.9669 + (-0.2194044 - 167.9669)/(1 + math.pow(percentage/218.2696,1.150048))
+    score = max(0, min(100, score))
+    
+    return score
+
+
+    
 if __name__ == '__main__':
     
     pass
