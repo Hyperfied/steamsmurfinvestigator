@@ -13,6 +13,16 @@ def score_account_games(numOfGames: int):
     
     return score
 
+def score_account_bans(numOfBans: int):
+    if numOfBans == 0:
+        return 0
+    if numOfBans == 1:
+        return 80
+    if numOfBans == 2:
+        return 90
+    if numOfBans >= 3:
+        return 100
+
 if __name__ == '__main__':
     
     pass
