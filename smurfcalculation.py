@@ -37,7 +37,11 @@ def score_last_2_weeks_versus_average(last2Weeks: float, average2Weeks: float):
     
     return score
 
-
+def score_account_value(value: float):
+    score = -15.39933 + (101.1556 - -15.39933)/(1 + math.pow(value/42.889,0.957756))
+    score = max(0, min(100, score))
+    
+    return score
     
 if __name__ == '__main__':
     
