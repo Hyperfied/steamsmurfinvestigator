@@ -22,6 +22,12 @@ def score_account_bans(numOfBans: int):
         return 90
     if numOfBans >= 3:
         return 100
+    
+def score_total_playtime(hours: int):
+    score = -22.14958 + (100.5163 - -22.14958)/(1 + math.pow(hours/103.3833,0.9577552))
+    score = max(0, min(100, score))
+    
+    return score
 
 if __name__ == '__main__':
     
