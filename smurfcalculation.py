@@ -42,6 +42,12 @@ def score_account_value(value: float):
     score = max(0, min(100, score))
     
     return score
+
+def score_account_friends(numOfFriends: int):
+    score = -7.734675 + (101.146 - -7.734675)/(1 + math.pow(numOfFriends/6.178119,2.069771))
+    score = max(0, min(100, score))
+    
+    return score
     
 if __name__ == '__main__':
     
