@@ -1,7 +1,7 @@
 import math
 
 
-def score_account_age(days: int):
+def score_account_age(days: float):
     score = -452.8427 + (114.4774 - -452.8427)/(1 + math.pow(days/35874.48,0.3517686))
     score = max(0, min(100, score))
     
@@ -23,7 +23,7 @@ def score_account_bans(numOfBans: int):
     if numOfBans >= 3:
         return 100
     
-def score_total_playtime(hours: int):
+def score_total_playtime(hours: float):
     score = -22.14958 + (100.5163 - -22.14958)/(1 + math.pow(hours/103.3833,0.9577552))
     score = max(0, min(100, score))
     
