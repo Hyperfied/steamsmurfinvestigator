@@ -48,6 +48,14 @@ def score_account_friends(numOfFriends: int):
     score = max(0, min(100, score))
     
     return score
+
+def score_average_achievement_percentage(numOfCompleted: int, totalAchievementsPossible: int):
+    percentage = (numOfCompleted/totalAchievementsPossible) * 100
+    
+    score = -34.81428 + (100.493 - -34.81428)/(1 + math.pow(percentage/23.93659,1.064883))
+    score = max(0, min(100, score))
+    
+    return score
     
 if __name__ == '__main__':
     
