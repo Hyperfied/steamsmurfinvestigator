@@ -7,6 +7,12 @@ def score_account_age(days: int):
     
     return score
 
+def score_account_games(numOfGames: int):
+    score = -18.8532 + (106.9959 - -18.8532)/(1 + math.pow(numOfGames/18.0617,1.006217))
+    score = max(0, min(100, score))
+    
+    return score
+
 if __name__ == '__main__':
-    print(score_account_age(700))
+    
     pass
