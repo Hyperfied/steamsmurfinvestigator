@@ -1,6 +1,9 @@
 import requests
+import json
 
-key = "APIKEY"
+with open("secrets.json", "r") as f:
+    secrets = json.loads(f)
+    steamKey = secrets["steamKey"]
 
 def friendTotal(requestString):
     x = requests.get(requestString)
@@ -89,19 +92,19 @@ def main():
 
         if tempString == "1":
             requestType = "https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key="
-            requestString = requestType + key + "&steamid=" + steamId
+            requestString = requestType + steamKey + "&steamid=" + steamId
             print(friendTotal(requestString))
         elif tempString == "2":
             requestType = "https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key="
-            requestString = requestType + key + "&steamid=" + steamId
+            requestString = requestType + steamKey + "&steamid=" + steamId
             print(friendTime(requestString))
         elif tempString == "3":
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key="
-            requestString = requestType + key + "&steamids=" + steamId
+            requestString = requestType + steamKey + "&steamids=" + steamId
             print(getBanNumber(requestString))
         elif tempString == "4":
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key="
-            requestString = requestType + key + "&steamids=" + steamId
+            requestString = requestType + steamKey + "&steamids=" + steamId
             print(currentlyBanned(requestString))
             
 
