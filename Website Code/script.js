@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
       // Replace YOUR_API_KEY with actual Steam API key
       const proxyUrl = "http://localhost:8080/proxy"; // Free CORS proxy
-      const apiKey = "BF399122946175FDBE493500E17E0C57";
+      const apiKey = "";
       const url = `${proxyUrl}/ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${steamId}`;
   
       try {
