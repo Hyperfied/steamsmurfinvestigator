@@ -7,19 +7,24 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Search Bar -->
-  <div class="search-bar">
-    <form id="searchForm">
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Enter Steam ID..." 
-        aria-label="Search"
-      />
-      <button type="submit" id="searchButton">Search</button>
-    </form>
-  </div>
-  
+  <!-- Header: Contains Search Bar and Dark Mode Toggle -->
+  <header class="header">
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form id="searchForm">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Enter Steam ID..." 
+          aria-label="Search"
+        />
+        <button type="submit" id="searchButton">Search</button>
+      </form>
+    </div>
+    <!-- Dark Mode Toggle Button -->
+    <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
+  </header>
+
   <!-- Message Display -->
   <div id="message"></div>
 
