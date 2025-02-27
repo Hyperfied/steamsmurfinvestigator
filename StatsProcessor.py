@@ -62,6 +62,19 @@ def numberOfGames(requestString):
     gameList = gameList.get("response")
     return gameList.get("game_count")
 
+def recentPlayTime(requestString):
+    # Gets total playtime in past 2 weeks from dictionary (in hour format, but you can change it to minutes below)
+    # also please note it wont work if your profile has game details set to private / friends only, and / or total playtime is hidden
+    response = requests.get(requestString)
+    dictionary = response.json()
+    playtime_total = 0 
+
+    if "response" in dictionary and "games" in dictionary["response"]:
+        for game in dictionary["response"]["games"]:
+            playtime_total += game.get("playtime_2weeks", 0)
+
+    return playtime_total / 60 # you can remove this if you want it to be minutes instead
+
 def checkForNumber(text):
     #Checks for if the input is a number between 0 and 9
     if text == "1" or text == "2" or text == "3" or text == "4" or text == "5" or text == "6" or text == "7" or text == "8" or text == "9" or text == "0":
@@ -76,7 +89,7 @@ def menu():
     print("4. Currently VAC banned")
     print("5. Account age")
     print("6. Number of games")
-
+    print("7. Total Playtime (past 2 weeks)")
 
 def main():
     tempString = "0"
@@ -84,6 +97,7 @@ def main():
         # Asks user to input a steamID
         #steamId = input("Please enter a steam userId ")
         steamId = "76561198880465660" # My own steamID can be used if you can't be bothered finding another
+        # if you want to get total playtime change this ID to one that has game details public 
 
         menu()
         tempString = input("Pick a nummber: ")
@@ -113,7 +127,10 @@ def main():
             requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
             print(numberOfGames(requestString))
-            
+        elif tempString == "7":
+            requestType = "https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key="
+            requestString = requestType + steamKey + "&steamid=" + steamId
+            print(recentPlayTime(requestString))
 
 
 main()
