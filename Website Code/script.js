@@ -1,3 +1,36 @@
+function updateSmurfBar(percentage) {
+  const smurfBarFill = document.querySelector(".smurf-bar-fill");
+  const smurfAnswer = document.querySelector(".smurf-answer");
+  const bottomSection = document.querySelector(".bottom-section");
+
+  // Ensure percentage is between 0 and 100
+  percentage = Math.max(0, Math.min(100, percentage));
+
+  // Update the width of the bar
+  smurfBarFill.style.width = percentage + "%";
+
+  // Change color based on percentage
+  if (percentage >= 80) {
+    smurfBarFill.style.background = "red";  // High risk (Smurf detected)
+    smurfAnswer.style.background = "#ff6257";
+    smurfAnswer.textContent = "Yes";
+  } 
+  else if (percentage >= 55 && percentage < 80)
+  {
+    smurfBarFill.style.background = "orange";  // High risk (Smurf detected)
+    smurfAnswer.style.background = "#ffba3b";
+    smurfAnswer.textContent = "No";
+  }
+  else {
+    smurfBarFill.style.background = "green"; // Low risk (Not a smurf)
+    smurfAnswer.style.background = "#ff6257";
+    smurfAnswer.textContent = "No";
+  }
+
+  // Ensure the section is visible
+  bottomSection.classList.add("show");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("searchForm");
   const searchInput = document.getElementById("searchInput");
@@ -5,6 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileNameDiv = document.querySelector(".profile-name");
   const profilePictureDiv = document.querySelector(".profile-picture");
   const recentSearchesContainer = document.querySelector(".recent-searches");
+
+  const smurfCalcSection = document.querySelector(".smurf-calc");
+  const bottomSectionSection = document.querySelector(".bottom-section");
 
   const darkModeToggle = document.getElementById("darkModeToggle");
 
@@ -24,6 +60,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (steamId) {
+      // Add 'show' class to smoothly reveal the section
+      smurfCalcSection.classList.add("show");
+      bottomSectionSection.classList.add("show");
+    }
+
     // Replace YOUR_API_KEY with actual Steam API key
     const proxyUrl = "http://localhost:8080/proxy"; // Free CORS proxy
     const apiKey = "";
@@ -41,6 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (data?.response?.players?.length > 0) {
         const player = data.response.players[0];
+
+        updateSmurfBar(60);
 
         // Update profile details
         profileNameDiv.textContent = player.personaname;
