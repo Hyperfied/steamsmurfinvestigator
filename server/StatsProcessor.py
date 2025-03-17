@@ -2,10 +2,15 @@ import requests
 import json
 import time
 
-with open("secrets.json", "r") as f:
-    secrets = json.loads(f)
+with open("../secrets.json", "r") as f:
+    secrets = json.load(f)
     steamKey = secrets["steamKey"]
 
+def getPlayerSummary(steamid):
+    requestString = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={steamKey}&steamids={steamid}"
+    response = requests.get(requestString).json()
+    return response.get("response").get("players")[0]
+    
 def friendTotal(requestString):
     # finds the length of the nested dictionary "friends"
     response = requests.get(requestString)
