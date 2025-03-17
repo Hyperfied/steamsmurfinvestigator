@@ -1,3 +1,6 @@
+
+const serverURL = "http://localhost:8000";
+
 function updateSmurfBar(percentage) {
   const smurfBarFill = document.querySelector(".smurf-bar-fill");
   const smurfAnswer = document.querySelector(".smurf-answer");
@@ -66,10 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
       bottomSectionSection.classList.add("show");
     }
 
-    // Replace YOUR_API_KEY with actual Steam API key
-    const proxyUrl = "http://localhost:8080/proxy"; // Free CORS proxy
-    const apiKey = "";
-    const url = `${proxyUrl}/ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${steamId}`;
+    // Use our server endpoints
+    const url = `${serverURL}/profile/${steamId}`;
 
     try {
       const response = await fetch(url);
@@ -78,17 +79,22 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = `Network error: ${response.statusText}`;
         throw new Error("Network response was not ok");
       }
-      const data = await response.json();
-      console.log("Steam API Response:", data);
 
-      if (data?.response?.players?.length > 0) {
-        const player = data.response.players[0];
+      const data = await response.json();
+      console.log("Backend API Response:", data);
+
+      if (response.ok) {
+        const personaname = data.personaName;
+        const realName = data.realName;
+        const avatar = data.avatar;
+        const avatarFull = data.avatarFull;
+        const avatarMedium = data.avatarMedium;
 
         updateSmurfBar(60);
 
         // Update profile details
-        profileNameDiv.textContent = player.personaname;
-        profilePictureDiv.innerHTML = `<img src="${player.avatarfull}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" />`;
+        profileNameDiv.textContent = personaname;
+        profilePictureDiv.innerHTML = `<img src="${avatarFull}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" />`;
         messageDiv.textContent = "Profile loaded successfully.";
         messageDiv.style.color = "green";
 
@@ -96,8 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const recentSearchItem = document.createElement("div");
         recentSearchItem.classList.add("recent-search-item");
         recentSearchItem.innerHTML = `
-          <img src="${player.avatarfull}" alt="${player.personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
-          <span style="vertical-align: middle;">${player.personaname}</span>
+          <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
+          <span style="vertical-align: middle;">${personaname}</span>
         `;
         // Append the new entry to recent searches (it stays until the page is closed)
         recentSearchesContainer.appendChild(recentSearchItem);
