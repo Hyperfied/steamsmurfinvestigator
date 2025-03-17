@@ -115,37 +115,21 @@ def achievementCompletion(steamId, requestString):
             valid_games += 1  
 
     return (completion_percentage / valid_games) if valid_games > 0 else 0 #If there arent any valid games it'll just return 0 instead
-    
-def getProfileDictionary(response):
-    name = response.json()
-    name = name["response"]["players"]
-    name = name[0]
-    return name
 
-def personaName(requestString):
-    response = requests.get(requestString)
-    name = getProfileDictionary(response)
-    return name.get("personaname")
+def personaName(playerSummary):
+    return playerSummary.get("personaname")
 
-def realName(requestString):
-    response = requests.get(requestString)
-    name = getProfileDictionary(response)
-    return name.get("realname")
+def realName(playerSummary):
+    return playerSummary.get("realname")
 
-def profilePictureLinkFull(requestString):
-    response = requests.get(requestString)
-    picture = getProfileDictionary(response)
-    return picture.get("avatarfull")
+def profilePictureLinkFull(playerSummary):
+    return playerSummary.get("avatarfull")
 
-def profilePictureLink(requestString):
-    response = requests.get(requestString)
-    picture = getProfileDictionary(response)
-    return picture.get("avatar")
+def profilePictureLink(playerSummary):
+    return playerSummary.get("avatar")
 
-def profilePictureLinkmedium(requestString):
-    response = requests.get(requestString)
-    picture = getProfileDictionary(response)
-    return picture.get("avatarmedium")
+def profilePictureLinkMedium(playerSummary):
+    return playerSummary.get("avatarmedium")
 
 def checkForNumber(text):
     #Checks for if the input is a number between 0 and 9
@@ -228,16 +212,14 @@ def main():
             requestString = requestType + steamKey + "&steamids=" + steamId
             print(realName(requestString))
         elif tempString == "3":
-            requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
-            requestString = requestType + steamKey + "&steamids=" + steamId
-            print(personaName(requestString))
+            print(personaName(steamId))
         elif tempString == "4":
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
             requestString = requestType + steamKey + "&steamids=" + steamId
             print(profilePictureLink(requestString))
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
             requestString = requestType + steamKey + "&steamids=" + steamId
-            print(profilePictureLinkmedium(requestString))
+            print(profilePictureLinkMedium(requestString))
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
             requestString = requestType + steamKey + "&steamids=" + steamId
             print(profilePictureLinkFull(requestString))
