@@ -238,4 +238,5 @@ def main():
             print(profilePictureLinkFull(requestString))
         menus = "1"
 
-main()
+if __name__ == "__main__":
+    main()
