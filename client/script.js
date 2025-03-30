@@ -1,6 +1,34 @@
 
 const serverURL = "http://localhost:8000";
 
+function formatAccountAge(seconds) {
+  // Calculate years, days, hours from total seconds
+  const years = Math.floor(seconds / (365 * 24 * 60 * 60));
+  const days = Math.floor((seconds % (365 * 24 * 60 * 60)) / (24 * 60 * 60));
+  const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+
+  if (years > 0) {
+    // If at least 1 year, display years, days, hours
+    return `${years} year${years > 1 ? "s" : ""}, ${days} day${days !== 1 ? "s" : ""}, ${hours} hour${hours !== 1 ? "s" : ""}`;
+  } else if (days > 0) {
+    // If less than a year but more than a day
+    return `${days} day${days !== 1 ? "s" : ""}, ${hours} hour${hours !== 1 ? "s" : ""}`;
+  } else {
+    // If less than a day
+    return `${hours} hour${hours !== 1 ? "s" : ""}`;
+  }
+}
+
+function formatHours(hours) {
+  // Use Math.ceil to round up to the next whole number
+  return `${Math.ceil(hours)} hours`;
+}
+
+function formatPercentage(value) {
+  // Round to 2 decimal places and add '%'
+  return `${value.toFixed(2)}%`;
+}
+
 function updateSmurfBar(percentage) {
   const smurfBarFill = document.querySelector(".smurf-bar-fill");
   const smurfAnswer = document.querySelector(".smurf-answer");
@@ -41,7 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileNameDiv = document.querySelector(".profile-name");
   const profilePictureDiv = document.querySelector(".profile-picture");
   const recentSearchesContainer = document.querySelector(".recent-searches");
-
+  const accountAgeDiv = document.querySelector(".account-age");
+  const numberOfGamesDiv = document.querySelector(".number-of-games");
+  const numberOfBansDiv = document.querySelector(".number-of-bans");
+  const totalPlaytimeDiv = document.querySelector(".total-playtime");
+  const totalRecentPlaytimeDiv = document.querySelector(".total-recent-playtime");
+  const numberOfFriendsDiv = document.querySelector(".number-of-friends");
+  const averageCompletionOfGamesDiv = document.querySelector(".average-completion-of-games");
   const smurfCalcSection = document.querySelector(".smurf-calc");
   const bottomSectionSection = document.querySelector(".bottom-section");
 
@@ -80,6 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Network response was not ok");
       }
 
+      // ----------------------------------------------------------------------------------------
+      
       const data = await response.json();
       console.log("Backend API Response:", data);
 
@@ -90,6 +126,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const avatarFull = data.avatarFull;
         const avatarMedium = data.avatarMedium;
 
+        const friendTotal = data.friendTotal;
+        const friendTimestamps = data.friendTimestamps;
+        const accountAgeSeconds = data.accountAgeSeconds;
+    
+        const banNumber = data.banNumber;
+        const currentlyVACBanned = data.currentlyVACBanned;
+    
+        const recentPlayTimeHours = data.recentPlayTimeHours;
+        const numberOfGames = data.numberOfGames;
+        const totalPlayTimeHours = data.totalPlayTimeHours;
+        const achievementCompletionPercentage = data.achievementCompletionPercentage;
+
+        // ----------------------------------------------------------------------------------------
+
         updateSmurfBar(60);
 
         // Update profile details
@@ -97,6 +147,19 @@ document.addEventListener("DOMContentLoaded", () => {
         profilePictureDiv.innerHTML = `<img src="${avatarFull}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" />`;
         messageDiv.textContent = "Profile loaded successfully.";
         messageDiv.style.color = "green";
+
+        // new section to update everything ------------------------------
+
+        accountAgeDiv.textContent = formatAccountAge(accountAgeSeconds);
+        numberOfGamesDiv.textContent = numberOfGames;
+        numberOfBansDiv.textContent = banNumber;
+        totalPlaytimeDiv.textContent = formatHours(totalPlayTimeHours);
+        totalRecentPlaytimeDiv.textContent = formatHours(recentPlayTimeHours);
+        numberOfFriendsDiv.textContent = friendTotal;
+        averageCompletionOfGamesDiv.textContent = formatPercentage(achievementCompletionPercentage);
+
+
+        // ---------------------------------------------------------------
 
         // Create a new recent search entry
         const recentSearchItem = document.createElement("div");

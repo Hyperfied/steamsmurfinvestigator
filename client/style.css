@@ -226,7 +226,14 @@ body {
   min-height: 50px;
 }
 
-.information-display {
+.information-display,
+.account-age,
+.number-of-games,
+.number-of-bans,
+.total-playtime,
+.total-recent-playtime,
+.number-of-friends,
+.average-completion-of-games {
   border: 0px solid var(--border-color);
   display: flex;
   text-align: center;
