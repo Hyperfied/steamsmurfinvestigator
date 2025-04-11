@@ -70,28 +70,27 @@ def recentPlayTime(requestString):
     response = requests.get(requestString)
     dictionary = response.json()
     playtime_total_recent = 0
-    playtime_total = 0
 
     if "response" in dictionary and "games" in dictionary["response"]:
         for game in dictionary["response"]["games"]:
             playtime_total_recent += game.get("playtime_2weeks", 0)
-            playtime_total += game.get("playtime_forever", 0)
-            
-    average_recent_playtime = 0 #totalplaytime / (totalAgeAccount / 2 weeks time)
 
-    return playtime_total_recent / 60, average_recent_playtime # you can remove this if you want it to be minutes instead
+    return playtime_total_recent / 60 # you can remove this if you want it to be minutes instead
 
 def totalPlayTime(requestString):
     #Same as above, but gets total playtime across whole account instead of 2 weeks. Same rules apply, you can change it to minutes
     response = requests.get(requestString)
     dictionary = response.json()
     playtime_total = 0
+    max_average_playtime_possible_recent = 336 * 60 #converting possible playtime to minutes; 336 is from 24 (hours) x 14 (days); 336 needs to be in minutes so * 60
 
     if "response" in dictionary and "games" in dictionary["response"]:
         for game in dictionary["response"]["games"]:
             playtime_total += game.get("playtime_forever", 0)
+            
+    average_playtime_recent = (playtime_total / max_average_playtime_possible_recent) #calculate a percentage for time user played in 2 weeks (336)
     
-    return playtime_total / 60
+    return playtime_total / 60, average_playtime_recent
 
 def achievementCompletion(steamId, requestString):
     # Gets achievements completed and uses the number of completed achievements divided by total possible achievements available x 100 to get an average percentage

@@ -5,53 +5,53 @@ const serverURL = "http://localhost:8000";
 // Functions to get scores from the API
 // -----------------------------------------------------
 
-// async function getAccountAgeScore(days) {
-//   const response = await fetch(`${serverURL}/smurf/accountAge/${days}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getAccountAgeScore(days) {
+  const response = await fetch(`${serverURL}/smurf/accountAge/${days}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getAccountGamesScore(numOfGames) {
-//   const response = await fetch(`${serverURL}/smurf/accountGames/${numOfGames}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getAccountGamesScore(numOfGames) {
+  const response = await fetch(`${serverURL}/smurf/accountGames/${numOfGames}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getAccountBansScore(numOfBans) {
-//   const response = await fetch(`${serverURL}/smurf/accountBans/${numOfBans}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getAccountBansScore(numOfBans) {
+  const response = await fetch(`${serverURL}/smurf/accountBans/${numOfBans}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getTotalPlaytimeScore(hours) {
-//   const response = await fetch(`${serverURL}/smurf/totalPlaytime/${hours}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getTotalPlaytimeScore(hours) {
+  const response = await fetch(`${serverURL}/smurf/totalPlaytime/${hours}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getLast2WeeksScore(last2Weeks, average2Weeks) {
-//   const response = await fetch(`${serverURL}/smurf/last2Weeks/${last2Weeks}/${average2Weeks}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getLast2WeeksScore(last2Weeks, average2Weeks) {
+  const response = await fetch(`${serverURL}/smurf/last2Weeks/${last2Weeks}/${average2Weeks}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getAccountValueScore(value) {
-//   const response = await fetch(`${serverURL}/smurf/accountValue/${value}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getAccountValueScore(value) {
+  const response = await fetch(`${serverURL}/smurf/accountValue/${value}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getAccountFriendsScore(numOfFriends) {
-//   const response = await fetch(`${serverURL}/smurf/accountFriends/${numOfFriends}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getAccountFriendsScore(numOfFriends) {
+  const response = await fetch(`${serverURL}/smurf/accountFriends/${numOfFriends}`);
+  const score = await response.json();
+  return score;
+}
 
-// async function getAchievementPercentageScore(completed, total) {
-//   const response = await fetch(`${serverURL}/smurf/achievementPercentage/${completed}/${total}`);
-//   const score = await response.json();
-//   return score;
-// }
+async function getAchievementPercentageScore(completed, total) {
+  const response = await fetch(`${serverURL}/smurf/achievementPercentage/${completed}/${total}`);
+  const score = await response.json();
+  return score;
+}
 
 function formatAccountAge(seconds) {
   // Calculate years, days, hours from total seconds
