@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from starlette.responses import FileResponse
 import StatsProcessor
+import smurfcalculation
 
 app = FastAPI()
 
@@ -52,6 +53,40 @@ async def profile(steamid: str):
     }
     
     return response
+
+
+
+# @app.get("/smurf/accountAge/{days}")
+# async def api_score_account_age(days: float):
+#     return smurfcalculation.score_account_age(days)
+
+# @app.get("/smurf/accountGames/{numOfGames}")
+# async def api_score_account_games(numOfGames: int):
+#     return smurfcalculation.score_account_games(numOfGames)
+
+# @app.get("/smurf/accountBans/{numOfBans}")
+# async def api_score_account_bans(numOfBans: int):
+#     return smurfcalculation.score_account_bans(numOfBans)
+
+# @app.get("/smurf/totalPlaytime/{hours}")
+# async def api_score_total_playtime(hours: float):
+#     return smurfcalculation.score_total_playtime(hours)
+
+# @app.get("/smurf/last2Weeks/{last2Weeks}/{average2Weeks}")
+# async def api_score_last2Weeks(last2Weeks: float, average2Weeks: float):
+#     return smurfcalculation.score_last_2_weeks_versus_average(last2Weeks, average2Weeks)
+
+# @app.get("/smurf/accountValue/{value}")
+# async def api_score_account_value(value: float):
+#     return smurfcalculation.score_account_value(value)
+
+# @app.get("/smurf/accountFriends/{numOfFriends}")
+# async def api_score_account_friends(numOfFriends: int):
+#     return smurfcalculation.score_account_friends(numOfFriends)
+
+# @app.get("/smurf/achievementPercentage/{completed}/{total}")
+# async def api_score_achievement_percentage(completed: int, total: int):
+#     return smurfcalculation.score_average_achievement_percentage(completed, total)
 
 
 if __name__ == "__main__":

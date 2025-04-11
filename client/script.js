@@ -1,6 +1,58 @@
 
 const serverURL = "http://localhost:8000";
 
+// -----------------------------------------------------
+// Functions to get scores from the API
+// -----------------------------------------------------
+
+// async function getAccountAgeScore(days) {
+//   const response = await fetch(`${serverURL}/smurf/accountAge/${days}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getAccountGamesScore(numOfGames) {
+//   const response = await fetch(`${serverURL}/smurf/accountGames/${numOfGames}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getAccountBansScore(numOfBans) {
+//   const response = await fetch(`${serverURL}/smurf/accountBans/${numOfBans}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getTotalPlaytimeScore(hours) {
+//   const response = await fetch(`${serverURL}/smurf/totalPlaytime/${hours}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getLast2WeeksScore(last2Weeks, average2Weeks) {
+//   const response = await fetch(`${serverURL}/smurf/last2Weeks/${last2Weeks}/${average2Weeks}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getAccountValueScore(value) {
+//   const response = await fetch(`${serverURL}/smurf/accountValue/${value}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getAccountFriendsScore(numOfFriends) {
+//   const response = await fetch(`${serverURL}/smurf/accountFriends/${numOfFriends}`);
+//   const score = await response.json();
+//   return score;
+// }
+
+// async function getAchievementPercentageScore(completed, total) {
+//   const response = await fetch(`${serverURL}/smurf/achievementPercentage/${completed}/${total}`);
+//   const score = await response.json();
+//   return score;
+// }
+
 function formatAccountAge(seconds) {
   // Calculate years, days, hours from total seconds
   const years = Math.floor(seconds / (365 * 24 * 60 * 60));
@@ -140,8 +192,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // ----------------------------------------------------------------------------------------
 
-        updateSmurfBar(60);
+        // const ageScore = await getAccountAgeScore(accountAgeSeconds / 360);
+        // const gamesScore = await getAccountGamesScore(numberOfGames);
+        // const bansScore = await getAccountBansScore(banNumber);
+        // const playtimeScore = await getTotalPlaytimeScore(totalPlayTimeHours);
+        // const last2WeeksScore = await getLast2WeeksScore(recentPlayTimeHours, average2WeeksHours?);
+        // const valueScore = await getAccountValueScore(accountValue?);
+        // const friendsScore = await getAccountFriendsScore(friendTotal);
+        // const achievementScore = await getAchievementPercentageScore(completedAchievements?, totalAchievements?);
 
+        // updateSmurfBar(ageScore + gamesScore + bansScore + playtimeScore + last2WeeksScore + valueScore + friendsScore + achievementScore);
+
+        // ----------------------------------------------------------------------------------------
+        
         // Update profile details
         profileNameDiv.textContent = personaname;
         profilePictureDiv.innerHTML = `<img src="${avatarFull}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" />`;
