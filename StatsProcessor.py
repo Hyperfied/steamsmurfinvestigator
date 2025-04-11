@@ -68,12 +68,15 @@ def recentPlayTime(requestString):
     response = requests.get(requestString)
     dictionary = response.json()
     playtime_total = 0 
+    total_possible_playtime = 336 * 60 #converting possible playtime to minutes; 336 is from 24 (hours) x 14 (days); 336 needs to be in minutes so * 60
 
     if "response" in dictionary and "games" in dictionary["response"]:
         for game in dictionary["response"]["games"]:
             playtime_total += game.get("playtime_2weeks", 0)
 
-    return playtime_total / 60 # you can remove this if you want it to be minutes instead
+    average_playtime_percentage = (playtime_total / total_possible_playtime) * 100 #calculate a percentage for time user played in 2 weeks (336)
+
+    return playtime_total / 60, average_playtime_percentage # will return playtime total in hours, and average playtime as percentage
 
 def totalPlayTime(requestString):
     #Same as above, but gets total playtime across whole account instead of 2 weeks. Same rules apply, you can change it to minutes
@@ -118,6 +121,32 @@ def achievementCompletion(steamId, requestString):
     avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 #If there arent any valid games it'll just return 0 instead
     return avg_percentage, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer
 
+def accountValue(requestString):
+    #Gets list of games, then gets each games price from steam store 
+    response = requests.get(requestString)
+    dictionary = response.json()
+    total_value = 0
+
+    if "response" in dictionary and "games" in dictionary["response"]:
+        for game in dictionary["response"]["games"]:
+            appId = game.get ("appid")
+
+            if not appId: #Skip if the appId is missing; theres probably better methods of implementation
+                continue
+
+            storeUrl = f"https://store.steampowered.com/api/appdetails?appids={appId}&cc=us" #querying steam store (per app ID)
+            storeResponse = requests.get(storeUrl)
+            storeData = storeResponse.json()
+
+            appData = storeData.get(str(appId), {}) #access nested data in the appId
+            if appData.get("success") and "data" in appData:
+                price_data = appData["data"].get("price_overview") #getting the price data
+                if price_data:
+                    price = price_data.get("final", 0)
+                    total_value += price / 100  # converting to dollars; default is cents (delete /100 if you want)
+
+    return total_value 
+
 def checkForNumber(text):
     #Checks for if the input is a number between 0 and 9
     if text == "1" or text == "2" or text == "3" or text == "4" or text == "5" or text == "6" or text == "7" or text == "8" or text == "9" or text == "0":
@@ -135,6 +164,7 @@ def menu():
     print("7. Total Playtime (past 2 weeks)")
     print("8. Total Playtime (across all games on account)")
     print("9. Average achievement completion percentage")
+    print("10. Account value ($) (Games)")
 
 def main():
     tempString = "0"
@@ -184,5 +214,9 @@ def main():
             requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
             print(*achievementCompletion(steamId, requestString))
+        elif tempString == "10":
+            requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
+            requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
+            print(accountValue(requestString))
 
 main()
