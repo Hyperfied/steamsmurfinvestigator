@@ -69,13 +69,17 @@ def recentPlayTime(requestString):
     # also please note it wont work if your profile has game details set to private / friends only, and / or total playtime is hidden
     response = requests.get(requestString)
     dictionary = response.json()
-    playtime_total = 0 
+    playtime_total_recent = 0
+    playtime_total = 0
 
     if "response" in dictionary and "games" in dictionary["response"]:
         for game in dictionary["response"]["games"]:
-            playtime_total += game.get("playtime_2weeks", 0)
+            playtime_total_recent += game.get("playtime_2weeks", 0)
+            playtime_total += game.get("playtime_forever", 0)
+            
+    average_recent_playtime = 0 #totalplaytime / (totalAgeAccount / 2 weeks time)
 
-    return playtime_total / 60 # you can remove this if you want it to be minutes instead
+    return playtime_total_recent / 60, average_recent_playtime # you can remove this if you want it to be minutes instead
 
 def totalPlayTime(requestString):
     #Same as above, but gets total playtime across whole account instead of 2 weeks. Same rules apply, you can change it to minutes
@@ -87,7 +91,7 @@ def totalPlayTime(requestString):
         for game in dictionary["response"]["games"]:
             playtime_total += game.get("playtime_forever", 0)
     
-    return playtime_total / 60 
+    return playtime_total / 60
 
 def achievementCompletion(steamId, requestString):
     # Gets achievements completed and uses the number of completed achievements divided by total possible achievements available x 100 to get an average percentage
@@ -131,6 +135,32 @@ def profilePictureLink(playerSummary):
 def profilePictureLinkMedium(playerSummary):
     return playerSummary.get("avatarmedium")
 
+def accountValue(requestString):
+    #Gets list of games, then gets each games price from steam store 
+    response = requests.get(requestString)
+    dictionary = response.json()
+    total_value = 0
+
+    if "response" in dictionary and "games" in dictionary["response"]:
+        for game in dictionary["response"]["games"]:
+            appId = game.get ("appid")
+
+            if not appId: #Skip if the appId is missing; theres probably better methods of implementation
+                continue
+
+            storeUrl = f"https://store.steampowered.com/api/appdetails?appids={appId}&cc=us" #querying steam store (per app ID)
+            storeResponse = requests.get(storeUrl)
+            storeData = storeResponse.json()
+
+            appData = storeData.get(str(appId), {}) #access nested data in the appId
+            if appData.get("success") and "data" in appData:
+                price_data = appData["data"].get("price_overview") #getting the price data
+                if price_data:
+                    price = price_data.get("final", 0)
+                    total_value += price / 100  # converting to dollars; default is cents (delete /100 if you want)
+
+    return total_value
+
 def checkForNumber(text):
     #Checks for if the input is a number between 0 and 9
     if text == "1" or text == "2" or text == "3" or text == "4" or text == "5" or text == "6" or text == "7" or text == "8" or text == "9" or text == "0":
@@ -148,6 +178,7 @@ def menu():
     print("7. Total Playtime (past 2 weeks)")
     print("8. Total Playtime (across all games on account)")
     print("9. Next menu")
+    print("10. Account value ($) (Games)")
 
 def menu2():
     print("1. Average achievement completion percentage")
@@ -157,73 +188,56 @@ def menu2():
 
 def main():
     tempString = "0"
-    menus = "1"
     while checkForNumber(tempString):
         # Asks user to input a steamID
         #steamId = input("Please enter a steam userId ")
         steamId = "76561198880465660" # My own steamID can be used if you can't be bothered finding another
         # if you want to get total playtime make sure this ID is one that has game details public 
-        if tempString == "9":
-            menu2()
-            menus = "2"
-        else:
-            menu()
+
+        menu()
         tempString = input("Pick a nummber: ")
         # requestType is the first part of the link which differs depending on which value you get
         # requestString is the requestType, steamKey and SteamId put together to form the full request 
-        if tempString == "1" and menus == "1":
+        if tempString == "1":
             requestType = "https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId
             print(friendTotal(requestString))
-        elif tempString == "2" and menus == "1":
+        elif tempString == "2":
             requestType = "https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId
             print(friendTime(requestString))
-        elif tempString == "3" and menus == "1":
+        elif tempString == "3":
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key="
             requestString = requestType + steamKey + "&steamids=" + steamId
             print(getBanNumber(requestString))
-        elif tempString == "4" and menus == "1":
+        elif tempString == "4":
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key="
             requestString = requestType + steamKey + "&steamids=" + steamId
             print(currentlyVACBanned(requestString))
-        elif tempString == "5" and menus == "1":
+        elif tempString == "5":
             requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
             requestString = requestType + steamKey + "&steamids=" + steamId
             print(accountAge(requestString))
-        elif tempString == "6" and menus == "1":
+        elif tempString == "6":
             requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
             print(numberOfGames(requestString))
-        elif tempString == "7" and menus == "1":
+        elif tempString == "7":
             requestType = "https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId
             print(recentPlayTime(requestString))
-        elif tempString == "8" and menus == "1":
+        elif tempString == "8":
             requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
             print(totalPlayTime(requestString))
-        elif tempString == "1":
+        elif tempString == "9":
             requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
             requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
-            print(achievementCompletion(steamId, requestString))
-        elif tempString == "2":
-            requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
-            requestString = requestType + steamKey + "&steamids=" + steamId
-            print(realName(requestString))
-        elif tempString == "3":
-            print(personaName(steamId))
-        elif tempString == "4":
-            requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
-            requestString = requestType + steamKey + "&steamids=" + steamId
-            print(profilePictureLink(requestString))
-            requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
-            requestString = requestType + steamKey + "&steamids=" + steamId
-            print(profilePictureLinkMedium(requestString))
-            requestType = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key="
-            requestString = requestType + steamKey + "&steamids=" + steamId
-            print(profilePictureLinkFull(requestString))
-        menus = "1"
+            print(*achievementCompletion(steamId, requestString))
+        elif tempString == "10":
+            requestType = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key="
+            requestString = requestType + steamKey + "&steamid=" + steamId + "&include_played_free_games=true"
+            print(accountValue(requestString))
 
 if __name__ == "__main__":
     main()
