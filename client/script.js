@@ -95,18 +95,18 @@ function updateSmurfBar(percentage) {
   // Change color based on percentage
   if (percentage >= 80) {
     smurfBarFill.style.background = "red";  // High risk (Smurf detected)
-    smurfAnswer.style.background = "#ff6257";
+    smurfAnswer.style.background = "red";
     smurfAnswer.textContent = "Yes";
   } 
-  else if (percentage >= 55 && percentage < 80)
+  else if (percentage >= 50 && percentage < 80)
   {
     smurfBarFill.style.background = "orange";  // High risk (Smurf detected)
-    smurfAnswer.style.background = "#ffba3b";
-    smurfAnswer.textContent = "No";
+    smurfAnswer.style.background = "#orange";
+    smurfAnswer.textContent = "Likely";
   }
   else {
     smurfBarFill.style.background = "green"; // Low risk (Not a smurf)
-    smurfAnswer.style.background = "#ff6257";
+    smurfAnswer.style.background = "green";
     smurfAnswer.textContent = "No";
   }
 
@@ -188,20 +188,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const recentPlayTimeHours = data.recentPlayTimeHours;
         const numberOfGames = data.numberOfGames;
         const totalPlayTimeHours = data.totalPlayTimeHours;
+        const averageRecentPlaytime = data.averagePlaytimeRecentHours;
         const achievementCompletionPercentage = data.achievementCompletionPercentage;
+        const totalPossibleAchievement = data.totalPossibleAchievements;
+        const completedAchievements = Math.trunc(totalPossibleAchievement * (achievementCompletionPercentage / 100));
+        const accountMoneyValue = data.accountValue;
 
         // ----------------------------------------------------------------------------------------
 
-        // const ageScore = await getAccountAgeScore(accountAgeSeconds / 360);
-        // const gamesScore = await getAccountGamesScore(numberOfGames);
-        // const bansScore = await getAccountBansScore(banNumber);
-        // const playtimeScore = await getTotalPlaytimeScore(totalPlayTimeHours);
-        // const last2WeeksScore = await getLast2WeeksScore(recentPlayTimeHours, average2WeeksHours?);
-        // const valueScore = await getAccountValueScore(accountValue?);
-        // const friendsScore = await getAccountFriendsScore(friendTotal);
-        // const achievementScore = await getAchievementPercentageScore(completedAchievements?, totalAchievements?);
+        const ageScore = await getAccountAgeScore(accountAgeSeconds / 360); //
+        const gamesScore = await getAccountGamesScore(numberOfGames); //
+        const bansScore = await getAccountBansScore(banNumber); //
+        const playtimeScore = await getTotalPlaytimeScore(totalPlayTimeHours); //
+        const last2WeeksScore = await getLast2WeeksScore(recentPlayTimeHours, (averageRecentPlaytime / 60)); //
+        const valueScore = await getAccountValueScore(accountMoneyValue); //
+        const friendsScore = await getAccountFriendsScore(friendTotal); //
+        const achievementScore = await getAchievementPercentageScore(completedAchievements, totalPossibleAchievement); //
 
-        // updateSmurfBar(ageScore + gamesScore + bansScore + playtimeScore + last2WeeksScore + valueScore + friendsScore + achievementScore);
+        updateSmurfBar(ageScore + gamesScore + bansScore + playtimeScore + last2WeeksScore + valueScore + friendsScore + achievementScore);
 
         // ----------------------------------------------------------------------------------------
         

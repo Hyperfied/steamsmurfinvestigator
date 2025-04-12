@@ -30,6 +30,9 @@ async def profile(steamid: str):
     recentRequest = f"https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key={StatsProcessor.steamKey}&steamid={steamid}"
     gamesRequest = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={StatsProcessor.steamKey}&steamid={steamid}&include_played_free_games=true"
     
+    totalPlaytimeHours, averagePlaytimeRecentHours = StatsProcessor.totalPlayTime(gamesRequest)
+    achievementPercentage, totalPossibleAchievements = StatsProcessor.achievementCompletion(steamid, gamesRequest)
+    
     response = {
         
         "personaName": StatsProcessor.personaName(summary),
@@ -47,8 +50,11 @@ async def profile(steamid: str):
         
         "recentPlayTimeHours": StatsProcessor.recentPlayTime(recentRequest),
         "numberOfGames": StatsProcessor.numberOfGames(gamesRequest),
-        "totalPlayTimeHours": StatsProcessor.totalPlayTime(gamesRequest),
-        "achievementCompletionPercentage": StatsProcessor.achievementCompletion(steamid, gamesRequest)
+        "totalPlayTimeHours": totalPlaytimeHours,
+        "averagePlaytimeRecentHours": averagePlaytimeRecentHours,
+        "achievementCompletionPercentage": achievementPercentage,
+        "totalPossibleAchievements": totalPossibleAchievements,
+        "accountValue": StatsProcessor.accountValue(gamesRequest)
                 
     }
     
@@ -56,37 +62,37 @@ async def profile(steamid: str):
 
 
 
-# @app.get("/smurf/accountAge/{days}")
-# async def api_score_account_age(days: float):
-#     return smurfcalculation.score_account_age(days)
+@app.get("/smurf/accountAge/{days}")
+async def api_score_account_age(days: float):
+    return smurfcalculation.score_account_age(days)
 
-# @app.get("/smurf/accountGames/{numOfGames}")
-# async def api_score_account_games(numOfGames: int):
-#     return smurfcalculation.score_account_games(numOfGames)
+@app.get("/smurf/accountGames/{numOfGames}")
+async def api_score_account_games(numOfGames: int):
+    return smurfcalculation.score_account_games(numOfGames)
 
-# @app.get("/smurf/accountBans/{numOfBans}")
-# async def api_score_account_bans(numOfBans: int):
-#     return smurfcalculation.score_account_bans(numOfBans)
+@app.get("/smurf/accountBans/{numOfBans}")
+async def api_score_account_bans(numOfBans: int):
+    return smurfcalculation.score_account_bans(numOfBans)
 
-# @app.get("/smurf/totalPlaytime/{hours}")
-# async def api_score_total_playtime(hours: float):
-#     return smurfcalculation.score_total_playtime(hours)
+@app.get("/smurf/totalPlaytime/{hours}")
+async def api_score_total_playtime(hours: float):
+    return smurfcalculation.score_total_playtime(hours)
 
-# @app.get("/smurf/last2Weeks/{last2Weeks}/{average2Weeks}")
-# async def api_score_last2Weeks(last2Weeks: float, average2Weeks: float):
-#     return smurfcalculation.score_last_2_weeks_versus_average(last2Weeks, average2Weeks)
+@app.get("/smurf/last2Weeks/{last2Weeks}/{average2Weeks}")
+async def api_score_last2Weeks(last2Weeks: float, average2Weeks: float):
+    return smurfcalculation.score_last_2_weeks_versus_average(last2Weeks, average2Weeks)
 
-# @app.get("/smurf/accountValue/{value}")
-# async def api_score_account_value(value: float):
-#     return smurfcalculation.score_account_value(value)
+@app.get("/smurf/accountValue/{value}")
+async def api_score_account_value(value: float):
+    return smurfcalculation.score_account_value(value)
 
-# @app.get("/smurf/accountFriends/{numOfFriends}")
-# async def api_score_account_friends(numOfFriends: int):
-#     return smurfcalculation.score_account_friends(numOfFriends)
+@app.get("/smurf/accountFriends/{numOfFriends}")
+async def api_score_account_friends(numOfFriends: int):
+    return smurfcalculation.score_account_friends(numOfFriends)
 
-# @app.get("/smurf/achievementPercentage/{completed}/{total}")
-# async def api_score_achievement_percentage(completed: int, total: int):
-#     return smurfcalculation.score_average_achievement_percentage(completed, total)
+@app.get("/smurf/achievementPercentage/{completed}/{total}")
+async def api_score_achievement_percentage(completed: int, total: int):
+    return smurfcalculation.score_average_achievement_percentage(completed, total)
 
 
 if __name__ == "__main__":

@@ -96,28 +96,34 @@ def achievementCompletion(steamId, requestString):
     # Gets achievements completed and uses the number of completed achievements divided by total possible achievements available x 100 to get an average percentage
     # Pretty sure profiles have to be public for this one too
     # will have to use the get all games owned api 
+
     response = requests.get(requestString, timeout = 200) # I added a timeout with high value because this one seems to be particularly heavy, you do need to give it time
     dictionary = response.json()
     allGames = dictionary.get("response", {}).get("games", [])
     completion_percentage = 0
     valid_games = 0 
+    total_possible_achievements = 0 #to list possible achievements as an integer as well
 
     for game in allGames:
         appId = game["appid"]
-    
+
         requestType = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?key=" #Has to be in here, if you can think of a way to neaten it so its consistent feel free to modify
         requestString = requestType + steamKey + "&steamid=" + steamId + "&appid=" + str(appId)
         achievement_response = requests.get(requestString)
         achievement_data = achievement_response.json()
-    
+
         achievement = achievement_data.get("playerstats", {}).get("achievements", [])
         possibleAchievements = len(achievement) #Used for counting over possible achievements in whole account
         completedAchievements = sum(1 for achieved in achievement if achieved.get("achieved", 0) == 1)  #Counting over actually completed / achieved ones
         if possibleAchievements > 0:
             completion_percentage += (completedAchievements / possibleAchievements) * 100 #Heres the formula used
-            valid_games += 1  
+            valid_games += 1 
+ 
+        total_possible_achievements += possibleAchievements #just adding possible achivements to total
 
-    return (completion_percentage / valid_games) if valid_games > 0 else 0 #If there arent any valid games it'll just return 0 instead
+    avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 #If there arent any valid games it'll just return 0 instead
+
+    return avg_percentage, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer
 
 def personaName(playerSummary):
     return playerSummary.get("personaname")
