@@ -20,7 +20,7 @@ async def get_script():
 @app.get("/profile/{steamid}")
 async def profile(steamid: str):
     
-    summary = StatsProcessor.getPlayerSummary(steamid)
+    summary = await StatsProcessor.getPlayerSummary(steamid)
     
     requestString = f"https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key={StatsProcessor.steamKey}&steamid={steamid}"
     ageRequest = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={StatsProcessor.steamKey}&steamids={steamid}"
@@ -30,8 +30,20 @@ async def profile(steamid: str):
     recentRequest = f"https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key={StatsProcessor.steamKey}&steamid={steamid}"
     gamesRequest = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={StatsProcessor.steamKey}&steamid={steamid}&include_played_free_games=true"
     
-    totalPlaytimeHours, averagePlaytimeRecentHours = StatsProcessor.totalPlayTime(gamesRequest)
-    achievementPercentage, totalPossibleAchievements = StatsProcessor.achievementCompletion(steamid, gamesRequest)
+    friendTotal = await StatsProcessor.friendTotal(requestString)
+    friendTimestamps = await StatsProcessor.friendTime(requestString)
+    accountAgeSeconds = await StatsProcessor.accountAge(ageRequest)
+    
+    banNumber = await StatsProcessor.getBanNumber(requestBanString)
+    currentlyVACBanned = await StatsProcessor.currentlyVACBanned(requestBanString)
+    
+    recentPlayTimeHours = await StatsProcessor.recentPlayTime(recentRequest)
+    numberOfGames = await StatsProcessor.numberOfGames(gamesRequest)
+    
+    totalPlaytimeHours, averagePlaytimeRecentHours = await StatsProcessor.totalPlayTime(gamesRequest)
+    achievementPercentage, totalPossibleAchievements = await StatsProcessor.achievementCompletion(steamid, gamesRequest)
+    
+    #accountValue = await StatsProcessor.accountValue(gamesRequest)
     
     response = {
         
@@ -41,20 +53,20 @@ async def profile(steamid: str):
         "avatarFull": StatsProcessor.profilePictureLinkFull(summary),
         "avatarMedium": StatsProcessor.profilePictureLinkMedium(summary),
         
-        "friendTotal": StatsProcessor.friendTotal(requestString),
-        "friendTimestamps": StatsProcessor.friendTime(requestString),
-        "accountAgeSeconds": StatsProcessor.accountAge(ageRequest),
+        "friendTotal": friendTotal,
+        "friendTimestamps": friendTimestamps,
+        "accountAgeSeconds": accountAgeSeconds,
         
-        "banNumber": StatsProcessor.getBanNumber(requestBanString),
-        "currentlyVACBanned": StatsProcessor.currentlyVACBanned(requestBanString),
+        "banNumber": banNumber,
+        "currentlyVACBanned": currentlyVACBanned,
         
-        "recentPlayTimeHours": StatsProcessor.recentPlayTime(recentRequest),
-        "numberOfGames": StatsProcessor.numberOfGames(gamesRequest),
+        "recentPlayTimeHours": recentPlayTimeHours,
+        "numberOfGames": numberOfGames,
         "totalPlayTimeHours": totalPlaytimeHours,
         "averagePlaytimeRecentHours": averagePlaytimeRecentHours,
         "achievementCompletionPercentage": achievementPercentage,
         "totalPossibleAchievements": totalPossibleAchievements,
-        "accountValue": StatsProcessor.accountValue(gamesRequest)
+        #"accountValue": accountValue
                 
     }
     
