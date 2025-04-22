@@ -43,7 +43,7 @@ async def profile(steamid: str):
     totalPlaytimeHours, averagePlaytimeRecentHours = await StatsProcessor.totalPlayTime(gamesRequest)
     achievementPercentage, totalPossibleAchievements = await StatsProcessor.achievementCompletion(steamid, gamesRequest)
     
-    #accountValue = await StatsProcessor.accountValue(gamesRequest)
+    accountValue = await StatsProcessor.accountValue(gamesRequest)
     
     response = {
         
@@ -66,7 +66,7 @@ async def profile(steamid: str):
         "averagePlaytimeRecentHours": averagePlaytimeRecentHours,
         "achievementCompletionPercentage": achievementPercentage,
         "totalPossibleAchievements": totalPossibleAchievements,
-        #"accountValue": accountValue
+        "accountValue": accountValue
                 
     }
     

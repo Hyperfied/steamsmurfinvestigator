@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import math
 
 with open("secrets.json", "r") as f:
     secrets = json.load(f)
@@ -141,29 +142,38 @@ def profilePictureLinkMedium(playerSummary):
     return playerSummary.get("avatarmedium")
 
 async def accountValue(requestString):
+    start = time.time()
     #Gets list of games, then gets each games price from steam store 
     response = requests.get(requestString)
     dictionary = response.json()
     total_value = 0
 
     if "response" in dictionary and "games" in dictionary["response"]:
+        appids = [] #List comprehension to get all appids from the games list
         for game in dictionary["response"]["games"]:
             appId = game.get ("appid")
 
             if not appId: #Skip if the appId is missing; theres probably better methods of implementation
                 continue
+            
+            appids.append(appId)
 
-            storeUrl = f"https://store.steampowered.com/api/appdetails?appids={appId}&cc=us" #querying steam store (per app ID)
+        for i in range(math.ceil(len(appids)/100)):
+            appids_string = ",".join(map(str, appids[i*100:(i+1)*100])) #Splitting the appids into chunks of 100 for the API request
+            storeUrl = f"https://store.steampowered.com/api/appdetails?appids={appids_string}&cc=us&filters=price_overview" #querying steam store (per app ID)
+            
             storeResponse = requests.get(storeUrl)
-            storeData = storeResponse.json()
+            storeData: dict = storeResponse.json()
 
-            appData = storeData.get(str(appId), {}) #access nested data in the appId
-            if appData.get("success") and "data" in appData:
-                price_data = appData["data"].get("price_overview") #getting the price data
-                if price_data:
-                    price = price_data.get("final", 0)
-                    total_value += price / 100  # converting to dollars; default is cents (delete /100 if you want)
+            for appid in storeData.values():
+                if appid.get("success") and "data" in appid and not appid.get("data") == []:
+                    price_data = appid.get("data").get("price_overview")
+                    if price_data:
+                        price = price_data.get("final", 0)
+                        total_value += price / 100
 
+
+    print("Time taken to get account value:", time.time() - start) #Just for testing purposes, you can remove this if you want
     return total_value
 
 def checkForNumber(text):
