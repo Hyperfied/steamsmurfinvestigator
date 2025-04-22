@@ -98,31 +98,36 @@ async def achievementCompletion(steamId, requestString):
     # Pretty sure profiles have to be public for this one too
     # will have to use the get all games owned api 
 
-    response = requests.get(requestString, timeout = 200) # I added a timeout with high value because this one seems to be particularly heavy, you do need to give it time
-    dictionary = response.json()
-    allGames = dictionary.get("response", {}).get("games", [])
+    start_time = time.time()
+
+    response = requests.get(requestString).json()
+    allGames = response.get("response", {}).get("games", [])
     completion_percentage = 0
     valid_games = 0 
     total_possible_achievements = 0 #to list possible achievements as an integer as well
 
-    for game in allGames:
+    request_string = f"https://api.steampowered.com/IPlayerService/GetTopAchievementsForGames/v1/?key={steamKey}&steamid={steamId}&language=en&max_achievements=10000&appids%5B0%5D=4000&appids%5B1%5D=3480"
+    
+    for i, game in enumerate(allGames):
         appId = game["appid"]
+        request_string += f"&appids%5B{i}%5D={appId}"
+        
+    response = requests.get(request_string).json()
+    
+    allGames = response.get("response", {}).get("games", [])
+    
+    for game in allGames:
+        if "total_achievements" in game:
+            total_achievements = game["total_achievements"]
+            if "achievements" in game:
+                completed_achievements = len(game["achievements"])
+                completion_percentage += (completed_achievements / total_achievements) * 100 if total_achievements > 0 else 0
+                valid_games += 1
+            total_possible_achievements += total_achievements
 
-        requestType = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?key=" #Has to be in here, if you can think of a way to neaten it so its consistent feel free to modify
-        requestString = requestType + steamKey + "&steamid=" + steamId + "&appid=" + str(appId)
-        achievement_response = requests.get(requestString)
-        achievement_data = achievement_response.json()
+    avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 
 
-        achievement = achievement_data.get("playerstats", {}).get("achievements", [])
-        possibleAchievements = len(achievement) #Used for counting over possible achievements in whole account
-        completedAchievements = sum(1 for achieved in achievement if achieved.get("achieved", 0) == 1)  #Counting over actually completed / achieved ones
-        if possibleAchievements > 0:
-            completion_percentage += (completedAchievements / possibleAchievements) * 100 #Heres the formula used
-            valid_games += 1 
- 
-        total_possible_achievements += possibleAchievements #just adding possible achivements to total
-
-    avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 #If there arent any valid games it'll just return 0 instead
+    print("Time taken to get achievement completion:", time.time() - start_time) #Just for testing purposes, you can remove this if you want
 
     return avg_percentage, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer
 
@@ -143,6 +148,7 @@ def profilePictureLinkMedium(playerSummary):
 
 async def accountValue(requestString):
     start = time.time()
+    
     #Gets list of games, then gets each games price from steam store 
     response = requests.get(requestString)
     dictionary = response.json()
@@ -159,11 +165,11 @@ async def accountValue(requestString):
             appids.append(appId)
 
         for i in range(math.ceil(len(appids)/100)):
-            appids_string = ",".join(map(str, appids[i*100:(i+1)*100])) #Splitting the appids into chunks of 100 for the API request
-            storeUrl = f"https://store.steampowered.com/api/appdetails?appids={appids_string}&cc=us&filters=price_overview" #querying steam store (per app ID)
+            appids_string = ",".join(map(str, appids[i*100:(i+1)*100])) # Splitting the appids into chunks of 100 for the API request
+            storeUrl = f"https://store.steampowered.com/api/appdetails?appids={appids_string}&cc=us&filters=price_overview" # querying steam store with 100 app ids
             
             storeResponse = requests.get(storeUrl)
-            storeData: dict = storeResponse.json()
+            storeData = storeResponse.json()
 
             for appid in storeData.values():
                 if appid.get("success") and "data" in appid and not appid.get("data") == []:
@@ -173,7 +179,8 @@ async def accountValue(requestString):
                         total_value += price / 100
 
 
-    print("Time taken to get account value:", time.time() - start) #Just for testing purposes, you can remove this if you want
+    print("Time taken to get account value:", time.time() - start) # for performance testing, you can remove this if you want
+    
     return total_value
 
 def checkForNumber(text):
