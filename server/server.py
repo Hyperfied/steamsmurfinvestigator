@@ -1,21 +1,21 @@
 from fastapi import FastAPI
 from starlette.responses import FileResponse
-import StatsProcessor
-import smurfcalculation
+import server.StatsProcessor as StatsProcessor
+import server.smurfcalculation as smurfcalculation
 
 app = FastAPI()
 
 @app.get("/")
 async def get_page():
-    return FileResponse("../client/index.html")
+    return FileResponse("./client/index.html")
 
 @app.get("/style.css")
 async def get_style():
-    return FileResponse("../client/style.css")
+    return FileResponse("./client/style.css")
 
 @app.get("/script.js")
 async def get_script():
-    return FileResponse("../client/script.js")
+    return FileResponse("./client/script.js")
 
 @app.get("/profile/{steamid}")
 async def profile(steamid: str):

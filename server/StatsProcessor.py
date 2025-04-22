@@ -2,23 +2,23 @@ import requests
 import json
 import time
 
-with open("../secrets.json", "r") as f:
+with open("secrets.json", "r") as f:
     secrets = json.load(f)
     steamKey = secrets["steamKey"]
 
-def getPlayerSummary(steamid):
+async def getPlayerSummary(steamid):
     requestString = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={steamKey}&steamids={steamid}"
     response = requests.get(requestString).json()
     return response.get("response").get("players")[0]
     
-def friendTotal(requestString):
+async def friendTotal(requestString):
     # finds the length of the nested dictionary "friends"
     response = requests.get(requestString)
     friendList = response.json()
     friendList = friendList["friendslist"]["friends"]
     return len(friendList)
 
-def friendTime(requestString):
+async def friendTime(requestString):
     # loops through the nested dictionary friends and adds each UNIX timestamp to a list then returns the list
     response = requests.get(requestString)
     friendList = response.json()
@@ -29,7 +29,7 @@ def friendTime(requestString):
         listOfTime.append(int(time))
     return listOfTime
             
-def getBanNumber(requestString):
+async def getBanNumber(requestString):
     # Accesses the dictionary in the list in the dictionary then outputs the number of bans the player has
     response = requests.get(requestString)
     dictionary = response.json()
@@ -38,7 +38,7 @@ def getBanNumber(requestString):
     numberOfBans = int(dictionary.get("NumberOfGameBans"))
     return numberOfBans
 
-def currentlyVACBanned(requestString):
+async def currentlyVACBanned(requestString):
     # Accesses the dictionary in the list in the dictionary then outputs whether the user is currently VAC banned
     response = requests.get(requestString)
     dictionary = response.json()
@@ -47,7 +47,7 @@ def currentlyVACBanned(requestString):
     numberOfBans = dictionary.get("VACBanned")
     return numberOfBans
 
-def accountAge(requestString):
+async def accountAge(requestString):
     # Gets the time stamp when the account was created then subtracts it from the current UNIX timestamp to give account age
     response = requests.get(requestString)
     dictionary = response.json()
@@ -57,14 +57,14 @@ def accountAge(requestString):
     currentTime = int(time.time())
     return currentTime - creationTimeStamp
 
-def numberOfGames(requestString):
+async def numberOfGames(requestString):
     # Gets the list of games played then returns the game count from the dictionary
     response = requests.get(requestString)
     gameList = response.json()
     gameList = gameList.get("response")
     return gameList.get("game_count")
 
-def recentPlayTime(requestString):
+async def recentPlayTime(requestString):
     # Gets total playtime in past 2 weeks from dictionary (in hour format, but you can change it to minutes below)
     # also please note it wont work if your profile has game details set to private / friends only, and / or total playtime is hidden
     response = requests.get(requestString)
@@ -77,7 +77,7 @@ def recentPlayTime(requestString):
 
     return playtime_total_recent / 60 # you can remove this if you want it to be minutes instead
 
-def totalPlayTime(requestString):
+async def totalPlayTime(requestString):
     #Same as above, but gets total playtime across whole account instead of 2 weeks. Same rules apply, you can change it to minutes
     response = requests.get(requestString)
     dictionary = response.json()
@@ -92,7 +92,7 @@ def totalPlayTime(requestString):
     
     return playtime_total / 60, average_playtime_recent
 
-def achievementCompletion(steamId, requestString):
+async def achievementCompletion(steamId, requestString):
     # Gets achievements completed and uses the number of completed achievements divided by total possible achievements available x 100 to get an average percentage
     # Pretty sure profiles have to be public for this one too
     # will have to use the get all games owned api 
@@ -140,7 +140,7 @@ def profilePictureLink(playerSummary):
 def profilePictureLinkMedium(playerSummary):
     return playerSummary.get("avatarmedium")
 
-def accountValue(requestString):
+async def accountValue(requestString):
     #Gets list of games, then gets each games price from steam store 
     response = requests.get(requestString)
     dictionary = response.json()
