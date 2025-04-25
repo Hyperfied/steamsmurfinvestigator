@@ -71,13 +71,13 @@ async def getGames(steamid):
     response = requests.get(requestString).json()
     gamesResponse = response.get("response")
     
-    numOfGames = getNumOfGames(response)
-    totalPlayTime = getTotalPlaytime(gamesResponse)
-    avgAchievementCompletion, totalPossibleAchievements = getAchievementCompletion(gamesResponse, steamid)
+    numOfGames = getNumOfGames(gamesResponse)
+    totalPlayTime, averagePlaytimeRecent = getTotalPlaytime(gamesResponse)
+    avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements = getAchievementCompletion(gamesResponse, steamid)
     
-    return numOfGames, totalPlayTime, avgAchievementCompletion, totalPossibleAchievements
+    return numOfGames, totalPlayTime, averagePlaytimeRecent, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements
     
-async def accountValue(steamid):
+async def getAccountValue(steamid):
     
     #Gets list of games, then gets each games price from steam store 
     requestString = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steamKey}&steamid={steamid}&include_played_free_games=true"
@@ -150,6 +150,7 @@ def getAchievementCompletion(gamesResponse, steamid):
     allGames = gamesResponse.get("games", [])
     completion_percentage = 0
     valid_games = 0 
+    total_completed_achievements = 0 #to list completed achievements as an integer as well
     total_possible_achievements = 0 #to list possible achievements as an integer as well
 
     request_string = f"https://api.steampowered.com/IPlayerService/GetTopAchievementsForGames/v1/?key={steamKey}&steamid={steamid}&language=en&max_achievements=10000"
@@ -167,9 +168,10 @@ def getAchievementCompletion(gamesResponse, steamid):
             total_achievements = game["total_achievements"]
             if "achievements" in game:
                 completed_achievements = len(game["achievements"])
+                total_completed_achievements += completed_achievements
                 completion_percentage += (completed_achievements / total_achievements) * 100 if total_achievements > 0 else 0
                 valid_games += 1
             total_possible_achievements += total_achievements
 
     avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 
-    return avg_percentage, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer
+    return avg_percentage, total_completed_achievements, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer

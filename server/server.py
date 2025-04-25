@@ -56,7 +56,7 @@ async def profile_summary(steamid: str):
 
 @app.get("/profile/friends/{steamid}")
 async def profile_friends(steamid: str):
-    length, timestamps = await StatsProcessor.friendTotal(steamid)
+    length, timestamps = await StatsProcessor.getFriendInfo(steamid)
     
     response = {
         "friendTotal": length,
@@ -78,21 +78,22 @@ async def profile_bans(steamid: str):
 
 @app.get("/profile/recent/{steamid}")
 async def profile_recent(steamid: str):
-    recentPlaytime, averageRecentPlaytime = await StatsProcessor.getRecentPlaytime(steamid)
+    recentPlaytime = await StatsProcessor.getRecentPlaytime(steamid)
     
-    response = { "recentPlaytimeHours": recentPlaytime,
-                "averageRecentPlaytime":  averageRecentPlaytime }
+    response = { "recentPlaytimeHours": recentPlaytime}
     
     return response
 
 @app.get("/profile/games/{steamid}")
 async def profile_games(steamid: str):
-    numOfGames, totalPlayTime, avgAchievementCompletion, totalPossibleAchievements = await StatsProcessor.getGames(steamid)
+    numOfGames, totalPlayTime, averageRecentPlaytime, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements = await StatsProcessor.getGames(steamid)
     
     response = {
         "numberOfGames": numOfGames,
         "totalPlaytimeHours": totalPlayTime,
+        "averageRecentPlaytime":  averageRecentPlaytime,
         "achievementCompletionPercentage": avgAchievementCompletion,
+        "totalCompletedAchiements": totalCompletedAchievements,
         "totalPossibleAchievements": totalPossibleAchievements
     }
     

@@ -1,9 +1,55 @@
 
 const serverURL = "http://localhost:8000";
 
-// -----------------------------------------------------
+// --------------------------------------
+// Functions to get data from the API
+// --------------------------------------
+
+async function getVanityURL(steamid) {
+  const response = await fetch(`${serverURL}/profile/vanityurl/${steamid}`);
+  const data = await response.json();
+  return data.steamid;
+}
+
+async function getSummary(steamid) {
+  const response = await fetch(`${serverURL}/profile/summary/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getFriends(steamid) {
+  const response = await fetch(`${serverURL}/profile/friends/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getBans(steamid) {
+  const response = await fetch(`${serverURL}/profile/bans/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getRecentPlaytime(steamid) {
+  const response = await fetch(`${serverURL}/profile/recent/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getGames(steamid) {
+  const response = await fetch(`${serverURL}/profile/games/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getAccountValue(steamid) {
+  const response = await fetch(`${serverURL}/profile/value/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+// --------------------------------------
 // Functions to get scores from the API
-// -----------------------------------------------------
+// --------------------------------------
 
 async function getAccountAgeScore(days) {
   const response = await fetch(`${serverURL}/smurf/accountAge/${days}`);
@@ -155,94 +201,94 @@ document.addEventListener("DOMContentLoaded", () => {
       bottomSectionSection.classList.add("show");
     }
 
-    // Use our server endpoints
-    const url = `${serverURL}/profile/${steamId}`;
-
     try {
-      const response = await fetch(url);
+      const newsteamid = await getVanityURL(steamId);
 
-      if (!response.ok) {
-        messageDiv.textContent = `Network error: ${response.statusText}`;
-        throw new Error("Network response was not ok");
-      }
+      // Summary Data
+      const summary = await getSummary(newsteamid);
+
+      const personaname = summary.personaName;
+      const realName = summary.realName;
+      const avatar = summary.avatar;
+      const avatarFull = summary.avatarFull;
+      const avatarMedium = summary.avatarMedium;
+      const accountAgeSeconds = summary.accountAgeSeconds;
+
+      // Update profile details
+      profileNameDiv.textContent = personaname;
+      profilePictureDiv.innerHTML = `<img src="${avatarFull}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" />`;
+      messageDiv.textContent = "Profile loaded successfully.";
+      messageDiv.style.color = "green";
+
+      accountAgeDiv.textContent = formatAccountAge(accountAgeSeconds);
+
+      // Friends Data
+      const friends = await getFriends(newsteamid);
+
+      const friendTotal = friends.friendTotal;
+      const friendTimestamps = friends.friendTimestamps;
+
+      numberOfFriendsDiv.textContent = friendTotal;
+
+      // Bans Data
+      const bans = await getBans(newsteamid);
+
+      const banNumber = bans.banNumber;
+      const currentlyVACBanned = bans.currentlyVACBanned;
+
+      numberOfBansDiv.textContent = banNumber;
+
+      // Recent Playtime Data
+      const recentPlaytime = await getRecentPlaytime(newsteamid);
+
+      const recentPlaytimeHours = recentPlaytime.recentPlaytimeHours;
+
+      totalRecentPlaytimeDiv.textContent = formatHours(recentPlaytimeHours);
+
+      // Games Data
+      const games = await getGames(newsteamid);
+
+      const numberOfGames = games.numberOfGames;
+      const totalPlaytimeHours = games.totalPlaytimeHours;
+      const averageRecentPlaytime = games.averageRecentPlaytime
+      const achievementCompletionPercentage = games.achievementCompletionPercentage;
+      const totalCompletedAchievements = games.totalCompletedAchievements;
+      const totalPossibleAchievements = games.totalPossibleAchievements;
+
+      numberOfGamesDiv.textContent = numberOfGames;
+      totalPlaytimeDiv.textContent = formatHours(totalPlaytimeHours);
+      averageCompletionOfGamesDiv.textContent = formatPercentage(achievementCompletionPercentage);
+
+      // Account Value Data
+      const accountValue = await getAccountValue(newsteamid);
+
+      const accountMoneyValue = accountValue.accountValue;
 
       // ----------------------------------------------------------------------------------------
-      
-      const data = await response.json();
-      console.log("Backend API Response:", data);
 
-      if (response.ok) {
-        const personaname = data.personaName;
-        const realName = data.realName;
-        const avatar = data.avatar;
-        const avatarFull = data.avatarFull;
-        const avatarMedium = data.avatarMedium;
+      const ageScore = await getAccountAgeScore(accountAgeSeconds / 360); //
+      const gamesScore = await getAccountGamesScore(numberOfGames); //
+      const bansScore = await getAccountBansScore(banNumber); //
+      const playtimeScore = await getTotalPlaytimeScore(totalPlaytimeHours); //
+      const last2WeeksScore = await getLast2WeeksScore(recentPlaytimeHours, (averageRecentPlaytime / 60)); //
+      const valueScore = await getAccountValueScore(accountMoneyValue); //
+      const friendsScore = await getAccountFriendsScore(friendTotal); //
+      const achievementScore = await getAchievementPercentageScore(totalCompletedAchievements, totalPossibleAchievements); //
 
-        const friendTotal = data.friendTotal;
-        const friendTimestamps = data.friendTimestamps;
-        const accountAgeSeconds = data.accountAgeSeconds;
-    
-        const banNumber = data.banNumber;
-        const currentlyVACBanned = data.currentlyVACBanned;
-    
-        const recentPlayTimeHours = data.recentPlayTimeHours;
-        const numberOfGames = data.numberOfGames;
-        const totalPlayTimeHours = data.totalPlayTimeHours;
-        const averageRecentPlaytime = data.averagePlaytimeRecentHours;
-        const achievementCompletionPercentage = data.achievementCompletionPercentage;
-        const totalPossibleAchievement = data.totalPossibleAchievements;
-        const completedAchievements = Math.trunc(totalPossibleAchievement * (achievementCompletionPercentage / 100));
-        const accountMoneyValue = data.accountValue;
+      updateSmurfBar(ageScore + gamesScore + bansScore + playtimeScore + last2WeeksScore + valueScore + friendsScore + achievementScore);
 
-        // ----------------------------------------------------------------------------------------
+      // ----------------------------------------------------------------------------------------
 
-        const ageScore = await getAccountAgeScore(accountAgeSeconds / 360); //
-        const gamesScore = await getAccountGamesScore(numberOfGames); //
-        const bansScore = await getAccountBansScore(banNumber); //
-        const playtimeScore = await getTotalPlaytimeScore(totalPlayTimeHours); //
-        const last2WeeksScore = await getLast2WeeksScore(recentPlayTimeHours, (averageRecentPlaytime / 60)); //
-        const valueScore = await getAccountValueScore(accountMoneyValue); //
-        const friendsScore = await getAccountFriendsScore(friendTotal); //
-        const achievementScore = await getAchievementPercentageScore(completedAchievements, totalPossibleAchievement); //
+      // Create a new recent search entry
+      const recentSearchItem = document.createElement("div");
+      recentSearchItem.classList.add("recent-search-item");
+      recentSearchItem.innerHTML = `
+        <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
+        <span style="vertical-align: middle;">${personaname}</span>
+      `;
+      // Append the new entry to recent searches (it stays until the page is closed)
+      recentSearchesContainer.appendChild(recentSearchItem);
 
-        updateSmurfBar(ageScore + gamesScore + bansScore + playtimeScore + last2WeeksScore + valueScore + friendsScore + achievementScore);
-
-        // ----------------------------------------------------------------------------------------
-        
-        // Update profile details
-        profileNameDiv.textContent = personaname;
-        profilePictureDiv.innerHTML = `<img src="${avatarFull}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;" />`;
-        messageDiv.textContent = "Profile loaded successfully.";
-        messageDiv.style.color = "green";
-
-        // new section to update everything ------------------------------
-
-        accountAgeDiv.textContent = formatAccountAge(accountAgeSeconds);
-        numberOfGamesDiv.textContent = numberOfGames;
-        numberOfBansDiv.textContent = banNumber;
-        totalPlaytimeDiv.textContent = formatHours(totalPlayTimeHours);
-        totalRecentPlaytimeDiv.textContent = formatHours(recentPlayTimeHours);
-        numberOfFriendsDiv.textContent = friendTotal;
-        averageCompletionOfGamesDiv.textContent = formatPercentage(achievementCompletionPercentage);
-
-
-        // ---------------------------------------------------------------
-
-        // Create a new recent search entry
-        const recentSearchItem = document.createElement("div");
-        recentSearchItem.classList.add("recent-search-item");
-        recentSearchItem.innerHTML = `
-          <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
-          <span style="vertical-align: middle;">${personaname}</span>
-        `;
-        // Append the new entry to recent searches (it stays until the page is closed)
-        recentSearchesContainer.appendChild(recentSearchItem);
-      } else {
-        messageDiv.textContent = "No player found with this Steam ID.";
-        profileNameDiv.textContent = "Profile Name";
-        profilePictureDiv.textContent = "Profile Picture";
-        messageDiv.style.color = "red";
-      }
     } catch (error) {
       console.error("Error fetching Steam profile:", error);
       messageDiv.textContent = "Error fetching Steam profile.";
