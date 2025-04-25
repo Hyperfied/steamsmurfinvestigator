@@ -26,145 +26,61 @@ async def getPlayerSummary(steamid):
     requestString = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={steamKey}&steamids={steamid}"
     response = requests.get(requestString).json()
     return response.get("response").get("players")[0]
+
+async def getFriendInfo(steamid):
+    requestString = f"https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key={steamKey}&steamid={steamid}"
+    response = requests.get(requestString).json()
     
-async def friendTotal(requestString):
-    # finds the length of the nested dictionary "friends"
-    response = requests.get(requestString)
-    friendList = response.json()
-    friendList = friendList["friendslist"]["friends"]
-    return len(friendList)
-
-async def friendTime(requestString):
-    # loops through the nested dictionary friends and adds each UNIX timestamp to a list then returns the list
-    response = requests.get(requestString)
-    friendList = response.json()
-    friendList = friendList["friendslist"]["friends"]
-    listOfTime = []
-    for entry in friendList:
+    friendsList = response.get("friendslist").get("friends")
+    
+    length = len(friendsList)
+    
+    friendTimestamps = []
+    
+    for entry in friendsList:
         time = entry.get("friend_since")
-        listOfTime.append(int(time))
-    return listOfTime
-            
-async def getBanNumber(requestString):
-    # Accesses the dictionary in the list in the dictionary then outputs the number of bans the player has
-    response = requests.get(requestString)
-    dictionary = response.json()
-    dictionary = dictionary.get("players")
-    dictionary = dictionary[0]
-    numberOfBans = int(dictionary.get("NumberOfGameBans"))
-    return numberOfBans
+        friendTimestamps.append(int(time))
+    
+    return length, friendTimestamps
 
-async def currentlyVACBanned(requestString):
-    # Accesses the dictionary in the list in the dictionary then outputs whether the user is currently VAC banned
-    response = requests.get(requestString)
-    dictionary = response.json()
-    dictionary = dictionary.get("players")
-    dictionary = dictionary[0]
-    numberOfBans = dictionary.get("VACBanned")
-    return numberOfBans
+async def getBans(steamid):
+    requestString = f"https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={steamKey}&steamids={steamid}"
+    response = requests.get(requestString).json()
+    
+    numberOfBans = int(response.get("players")[0].get("NumberOfGameBans"))
+    currentlyVACBanned = int(response.get("players")[0].get("VACBanned"))
+    
+    return numberOfBans, currentlyVACBanned
 
-async def accountAge(requestString):
-    # Gets the time stamp when the account was created then subtracts it from the current UNIX timestamp to give account age
-    response = requests.get(requestString)
-    dictionary = response.json()
-    dictionary = dictionary["response"]["players"]
-    dictionary = dictionary[0]
-    creationTimeStamp = int(dictionary.get("timecreated"))
-    currentTime = int(time.time())
-    return currentTime - creationTimeStamp
-
-async def numberOfGames(requestString):
-    # Gets the list of games played then returns the game count from the dictionary
-    response = requests.get(requestString)
-    gameList = response.json()
-    gameList = gameList.get("response")
-    return gameList.get("game_count")
-
-async def recentPlayTime(requestString):
+async def getRecentPlaytime(steamid):
     # Gets total playtime in past 2 weeks from dictionary (in hour format, but you can change it to minutes below)
     # also please note it wont work if your profile has game details set to private / friends only, and / or total playtime is hidden
-    response = requests.get(requestString)
-    dictionary = response.json()
+    requestString = f"https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key={steamKey}&steamid={steamid}"
+    response = requests.get(requestString).json()
+    
     playtime_total_recent = 0
 
-    if "response" in dictionary and "games" in dictionary["response"]:
-        for game in dictionary["response"]["games"]:
+    if "response" in response and "games" in response["response"]:
+        for game in response["response"]["games"]:
             playtime_total_recent += game.get("playtime_2weeks", 0)
-
-    return playtime_total_recent / 60 # you can remove this if you want it to be minutes instead
-
-async def totalPlayTime(requestString):
-    #Same as above, but gets total playtime across whole account instead of 2 weeks. Same rules apply, you can change it to minutes
-    response = requests.get(requestString)
-    dictionary = response.json()
-    playtime_total = 0
-    max_average_playtime_possible_recent = 336 * 60 #converting possible playtime to minutes; 336 is from 24 (hours) x 14 (days); 336 needs to be in minutes so * 60
-
-    if "response" in dictionary and "games" in dictionary["response"]:
-        for game in dictionary["response"]["games"]:
-            playtime_total += game.get("playtime_forever", 0)
             
-    average_playtime_recent = (playtime_total / max_average_playtime_possible_recent) #calculate a percentage for time user played in 2 weeks (336)
-    
-    return playtime_total / 60, average_playtime_recent
+    return playtime_total_recent / 60
 
-async def achievementCompletion(steamId, requestString):
-    # Gets achievements completed and uses the number of completed achievements divided by total possible achievements available x 100 to get an average percentage
-    # Pretty sure profiles have to be public for this one too
-    # will have to use the get all games owned api 
-
-    start_time = time.time()
-
+async def getGames(steamid):
+    requestString = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steamKey}&steamid={steamid}&include_played_free_games=true"
     response = requests.get(requestString).json()
-    allGames = response.get("response", {}).get("games", [])
-    completion_percentage = 0
-    valid_games = 0 
-    total_possible_achievements = 0 #to list possible achievements as an integer as well
-
-    request_string = f"https://api.steampowered.com/IPlayerService/GetTopAchievementsForGames/v1/?key={steamKey}&steamid={steamId}&language=en&max_achievements=10000&appids%5B0%5D=4000&appids%5B1%5D=3480"
+    gamesResponse = response.get("response")
     
-    for i, game in enumerate(allGames):
-        appId = game["appid"]
-        request_string += f"&appids%5B{i}%5D={appId}"
-        
-    response = requests.get(request_string).json()
+    numOfGames = getNumOfGames(response)
+    totalPlayTime = getTotalPlaytime(gamesResponse)
+    avgAchievementCompletion, totalPossibleAchievements = getAchievementCompletion(gamesResponse, steamid)
     
-    allGames = response.get("response", {}).get("games", [])
+    return numOfGames, totalPlayTime, avgAchievementCompletion, totalPossibleAchievements
     
-    for game in allGames:
-        if "total_achievements" in game:
-            total_achievements = game["total_achievements"]
-            if "achievements" in game:
-                completed_achievements = len(game["achievements"])
-                completion_percentage += (completed_achievements / total_achievements) * 100 if total_achievements > 0 else 0
-                valid_games += 1
-            total_possible_achievements += total_achievements
-
-    avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 
-
-    print("Time taken to get achievement completion:", time.time() - start_time) #Just for testing purposes, you can remove this if you want
-
-    return avg_percentage, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer
-
-def personaName(playerSummary):
-    return playerSummary.get("personaname")
-
-def realName(playerSummary):
-    return playerSummary.get("realname")
-
-def profilePictureLinkFull(playerSummary):
-    return playerSummary.get("avatarfull")
-
-def profilePictureLink(playerSummary):
-    return playerSummary.get("avatar")
-
-def profilePictureLinkMedium(playerSummary):
-    return playerSummary.get("avatarmedium")
-
-async def accountValue(requestString):
-    start = time.time()
+async def accountValue(steamid):
     
     #Gets list of games, then gets each games price from steam store 
+    requestString = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steamKey}&steamid={steamid}&include_played_free_games=true"
     response = requests.get(requestString)
     dictionary = response.json()
     total_value = 0
@@ -192,11 +108,72 @@ async def accountValue(requestString):
                     if price_data:
                         price = price_data.get("final", 0)
                         total_value += price / 100
-
-
-    print("Time taken to get account value:", time.time() - start) # for performance testing, you can remove this if you want
     
     return total_value
+
+def personaName(playerSummary):
+    return playerSummary.get("personaname")
+
+def realName(playerSummary):
+    return playerSummary.get("realname")
+
+def profilePictureLinkFull(playerSummary):
+    return playerSummary.get("avatarfull")
+
+def profilePictureLink(playerSummary):
+    return playerSummary.get("avatar")
+
+def profilePictureLinkMedium(playerSummary):
+    return playerSummary.get("avatarmedium")
+
+def getAccountAge(playerSummary):
+    creationTimeStamp = int(playerSummary.get("timecreated"))
+    currentTime = int(time.time())
+    return currentTime - creationTimeStamp
+
+def getNumOfGames(gamesResponse):
+    return gamesResponse.get("game_count")
+
+def getTotalPlaytime(gamesResponse):
+    playtime_total = 0
+    max_average_playtime_possible_recent = 336 * 60 #converting possible playtime to minutes; 336 is from 24 (hours) x 14 (days); 336 needs to be in minutes so * 60
+
+    if "games" in gamesResponse:
+        for game in gamesResponse["games"]:
+            playtime_total += game.get("playtime_forever", 0)
+            
+    average_playtime_recent = (playtime_total / max_average_playtime_possible_recent) #calculate a percentage for time user played in 2 weeks (336)
+    
+    return playtime_total / 60, average_playtime_recent
+
+def getAchievementCompletion(gamesResponse, steamid):
+    allGames = gamesResponse.get("games", [])
+    completion_percentage = 0
+    valid_games = 0 
+    total_possible_achievements = 0 #to list possible achievements as an integer as well
+
+    request_string = f"https://api.steampowered.com/IPlayerService/GetTopAchievementsForGames/v1/?key={steamKey}&steamid={steamid}&language=en&max_achievements=10000"
+    
+    for i, game in enumerate(allGames):
+        appId = game["appid"]
+        request_string += f"&appids%5B{i}%5D={appId}"
+        
+    response = requests.get(request_string).json()
+    
+    allGames = response.get("response", {}).get("games", [])
+    
+    for game in allGames:
+        if "total_achievements" in game:
+            total_achievements = game["total_achievements"]
+            if "achievements" in game:
+                completed_achievements = len(game["achievements"])
+                completion_percentage += (completed_achievements / total_achievements) * 100 if total_achievements > 0 else 0
+                valid_games += 1
+            total_possible_achievements += total_achievements
+
+    avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 
+    return avg_percentage, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer
+
 
 def checkForNumber(text):
     #Checks for if the input is a number between 0 and 9
