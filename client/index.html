@@ -1,83 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Smurf Checker</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <!-- Header: Contains Search Bar and Dark Mode Toggle -->
-  <header class="header">
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <form id="searchForm">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Enter Steam ID..." 
-          aria-label="Search"
-        />
-        <button type="submit" id="searchButton">Search</button>
-      </form>
-    </div>
-    <!-- Dark Mode Toggle Button -->
-    <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
-  </header>
-
-  <!-- Message Display -->
-  <div id="message"></div>
-
-  <!-- Main Container -->
-  <div class="container">
-    <!-- Main (Left) Column -->
-    <div class="column main">
-      <!-- Profile Section (top) -->
-      <div class="profile-section">
-        <div class="profile-picture">Waiting For Steam ID</div>
-        <div class="profile-name"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smurf Checker</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Header: Contains Search Bar and Dark Mode Toggle -->
+    <header class="header">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <form id="searchForm">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Enter Steam ID or Username..."
+            aria-label="Search"
+          />
+          <button type="submit" id="searchButton">Search</button>
+        </form>
       </div>
+      <!-- Dark Mode Toggle Button -->
+      <button id="darkModeToggle" class="dark-mode-toggle">
+        Toggle Dark Mode
+      </button>
+    </header>
 
-      <!-- Smurf Calculation Area (middle) -->
-      <div class="smurf-calc">
-        <div class="information-boxes">Account Age:</div>
-        <div class="account-age"></div>
+    <!-- Message Display -->
+    <div id="message"></div>
 
-        <div class="information-boxes">Number Of Games:</div>
-        <div class="number-of-games"></div>
-
-        <div class="information-boxes">Number Of Bans:</div>
-        <div class="number-of-bans"></div>
-
-        <div class="information-boxes">Total Playtime:</div>
-        <div class="total-playtime"></div>
-
-        <div class="information-boxes">Total Playtime In Last Two Weeks:</div>
-        <div class="total-recent-playtime"></div>
-
-        <div class="information-boxes">Number Of Friends:</div>
-        <div class="number-of-friends"></div>
-
-        <div class="information-boxes">Average Completion Of Games %:</div>
-        <div class="average-completion-of-games"></div>
-
-      </div>
-
-      <!-- Bottom Section (only bar & yes/no) -->
-      <div class="bottom-section">
-        <div class="smurf-bar">
-          <div class="smurf-bar-fill"></div>
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Main (Left) Column -->
+      <div class="column main">
+        <!-- Profile Section (top) -->
+        <div class="profile-section">
+          <div class="profile-picture">Waiting For Steam ID</div>
+          <div class="profile-name"></div>
         </div>
-        <div class="smurf-answer">N/A</div>
+
+        <!-- Smurf Calculation Area (middle) -->
+        <div class="smurf-calc">
+          <div class="information-boxes">Account Age:</div>
+          <div class="account-age"></div>
+
+          <div class="information-boxes">Number Of Games:</div>
+          <div class="number-of-games"></div>
+
+          <div class="information-boxes">Number Of Bans:</div>
+          <div class="number-of-bans"></div>
+
+          <div class="information-boxes">Total Playtime:</div>
+          <div class="total-playtime"></div>
+
+          <div class="information-boxes">Total Playtime In Last Two Weeks:</div>
+          <div class="total-recent-playtime"></div>
+
+          <div class="information-boxes">Number Of Friends:</div>
+          <div class="number-of-friends"></div>
+
+          <div class="information-boxes">Average Completion Of Games %:</div>
+          <div class="average-completion-of-games"></div>
+        </div>
+
+        <!-- Bottom Section (only bar & yes/no) -->
+        <div class="bottom-section">
+          <div class="smurf-bar">
+            <div class="smurf-bar-fill"></div>
+          </div>
+          <div class="smurf-answer">N/A</div>
+        </div>
+      </div>
+
+      <!-- Right Column (Recent searches) -->
+      <div class="column">
+        <div class="recent-searches">Recent searches</div>
       </div>
     </div>
 
-    <!-- Right Column (Recent searches) -->
-    <div class="column">
-      <div class="recent-searches">Recent searches</div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>

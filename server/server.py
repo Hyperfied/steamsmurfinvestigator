@@ -1,10 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 import server.StatsProcessor as StatsProcessor
 import server.smurfcalculation as smurfcalculation
 import time
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_methods=["GET"],
+    allow_origins=["*"]
+)
 
 @app.get("/")
 async def get_page():
@@ -20,6 +27,8 @@ async def get_script():
 
 @app.get("/profile/{steamid}")
 async def profile(steamid: str):
+    
+    steamid = await StatsProcessor.tryVanityURL(steamid)
     
     summary = await StatsProcessor.getPlayerSummary(steamid)
     

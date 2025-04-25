@@ -6,6 +6,21 @@ import math
 with open("secrets.json", "r") as f:
     secrets = json.load(f)
     steamKey = secrets["steamKey"]
+    
+
+    
+async def tryVanityURL(steamid):
+    request = f"https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key={steamKey}&vanityurl={steamid}"
+    response = requests.get(request)
+    
+    if response.status_code != 200:
+        print("Error: Unable to resolve vanity URL")
+        return steamid
+    
+    if response.json().get("response").get("success") == 1:
+        return response.json().get("response").get("steamid")
+    else:
+        return steamid
 
 async def getPlayerSummary(steamid):
     requestString = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={steamKey}&steamids={steamid}"
