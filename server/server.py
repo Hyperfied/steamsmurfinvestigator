@@ -78,9 +78,10 @@ async def profile_bans(steamid: str):
 
 @app.get("/profile/recent/{steamid}")
 async def profile_recent(steamid: str):
-    recentPlaytime = await StatsProcessor.getRecentPlaytime(steamid)
+    recentPlaytime, averageRecentPlaytime = await StatsProcessor.getRecentPlaytime(steamid)
     
-    response = { "recentPlaytimeHours": recentPlaytime }
+    response = { "recentPlaytimeHours": recentPlaytime,
+                "averageRecentPlaytime":  averageRecentPlaytime }
     
     return response
 
