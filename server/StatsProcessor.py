@@ -68,7 +68,8 @@ async def getRecentPlaytime(steamid):
 
 async def getGames(steamid):
     requestString = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steamKey}&steamid={steamid}&include_played_free_games=true"
-    response = requests.get(requestString).json()
+    response = requests.get(requestString)
+    response = response.json()
     gamesResponse = response.get("response")
     
     numOfGames = getNumOfGames(gamesResponse)
@@ -155,23 +156,31 @@ def getAchievementCompletion(gamesResponse, steamid):
 
     request_string = f"https://api.steampowered.com/IPlayerService/GetTopAchievementsForGames/v1/?key={steamKey}&steamid={steamid}&language=en&max_achievements=10000"
     
+    current_string = request_string
+
     for i, game in enumerate(allGames):
         appId = game["appid"]
-        request_string += f"&appids%5B{i}%5D={appId}"
-        
-    response = requests.get(request_string).json()
-    
-    allGames = response.get("response", {}).get("games", [])
-    
-    for game in allGames:
-        if "total_achievements" in game:
-            total_achievements = game["total_achievements"]
-            if "achievements" in game:
-                completed_achievements = len(game["achievements"])
-                total_completed_achievements += completed_achievements
-                completion_percentage += (completed_achievements / total_achievements) * 100 if total_achievements > 0 else 0
-                valid_games += 1
-            total_possible_achievements += total_achievements
+        current_string += f"&appids%5B{i}%5D={appId}"
+
+        if i % 100 == 99 or i == len(allGames) - 1:
+            # Send the request for the current batch of appids
+            response = requests.get(current_string)
+            response = response.json()
+            
+            allGames = response.get("response", {}).get("games", [])
+            
+            for game in allGames:
+                if "total_achievements" in game:
+                    total_achievements = game["total_achievements"]
+                    if "achievements" in game:
+                        completed_achievements = len(game["achievements"])
+                        total_completed_achievements += completed_achievements
+                        completion_percentage += (completed_achievements / total_achievements) * 100 if total_achievements > 0 else 0
+                        valid_games += 1
+                    total_possible_achievements += total_achievements
+
+            # Reset the request string for the next batch of appids
+            current_string = request_string
 
     avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 
     return avg_percentage, total_completed_achievements, total_possible_achievements  # return average percentage and total possible achievements; one is a percentage and the other an integer

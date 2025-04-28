@@ -93,7 +93,7 @@ async def profile_games(steamid: str):
         "totalPlaytimeHours": totalPlayTime,
         "averageRecentPlaytime":  averageRecentPlaytime,
         "achievementCompletionPercentage": avgAchievementCompletion,
-        "totalCompletedAchiements": totalCompletedAchievements,
+        "totalCompletedAchievements": totalCompletedAchievements,
         "totalPossibleAchievements": totalPossibleAchievements
     }
     
