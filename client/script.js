@@ -1,9 +1,15 @@
 
 const serverURL = "http://localhost:8000";
 
-// --------------------------------------
-// Functions to get data from the API
-// --------------------------------------
+// DOM Elements
+
+let recentSearchesContainer = null;
+
+let recentSearches = [];
+
+//
+//
+//
 
 async function getVanityURL(steamid) {
   const response = await fetch(`${serverURL}/profile/vanityurl/${steamid}`);
@@ -47,7 +53,8 @@ async function getAccountValue(steamid) {
   return data;
 }
 
-// --------------------------------------
+
+// -----------------------------------------------------
 // Functions to get scores from the API
 // --------------------------------------
 
@@ -160,13 +167,85 @@ function updateSmurfBar(percentage) {
   bottomSection.classList.add("show");
 }
 
+function addRecentSearchDiv(steamId, personaname, avatarFull) {
+  const recentSearchItem = document.createElement("div");
+  recentSearchItem.classList.add("recent-search-item");
+  recentSearchItem.innerHTML = `
+    <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
+    <span style="vertical-align: middle;">${personaname}</span>
+  `;
+  recentSearchItem.addEventListener("click", () => {
+    // When clicked, fill the input with the Steam ID and trigger the search
+    searchInput.value = steamId;
+    searchForm.dispatchEvent(new Event("submit", {cancelable: true}));
+
+  });
+  // Append the new entry to recent searches (it stays until the page is closed)
+  recentSearchesContainer.appendChild(recentSearchItem);
+}
+
+function updateRecentSearchesDisplay() {
+  let recentSearchesHeader = document.createElement("div");
+  recentSearchesHeader.classList.add("recent-searches-header");
+
+  let recentSearchesClear = document.createElement("span");
+  recentSearchesClear.textContent = "X";
+  recentSearchesClear.style.cursor = "pointer";
+  recentSearchesClear.addEventListener("click", () => {
+    // Clear recent searches from local storage and the display
+    if (confirm("Are you sure you want to clear recent searches?")) {
+      recentSearches = [];
+      localStorage.removeItem("recentSearches");
+      updateRecentSearchesDisplay();
+    }
+  })
+
+  let recentSearchesTitle = document.createElement("span");
+  recentSearchesTitle.textContent = "Recent Searches";
+
+  recentSearchesHeader.appendChild(recentSearchesTitle);
+  recentSearchesHeader.appendChild(recentSearchesClear);
+
+  recentSearchesContainer.innerHTML = ""; // Clear previous entries
+  recentSearchesContainer.appendChild(recentSearchesHeader); // Add header to the container
+  recentSearches.forEach(search => {
+    addRecentSearchDiv(search.steamId, search.personaname, search.avatarFull);
+  });
+
+}
+
+function addRecentSearch(steamId, personaname, avatarFull) {
+  const newSearch = { steamId, personaname, avatarFull };
+  
+  // Check if the search already exists in the array
+  const existingIndex = recentSearches.findIndex(search => search.steamId === steamId);
+  if (existingIndex !== -1) {
+    // If it exists, remove it from its current position
+    recentSearches.splice(existingIndex, 1);
+  }
+
+  // Add the new search to the beginning of the array
+  recentSearches.unshift(newSearch);
+
+  // Limit the number of recent searches to 10
+  if (recentSearches.length > 10) {
+    recentSearches.pop(); // Remove the oldest search
+  }
+
+  // Update the recent searches display
+  updateRecentSearchesDisplay();
+
+  // Save the recent searches to local storage
+  localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("searchForm");
   const searchInput = document.getElementById("searchInput");
   const messageDiv = document.getElementById("message");
   const profileNameDiv = document.querySelector(".profile-name");
   const profilePictureDiv = document.querySelector(".profile-picture");
-  const recentSearchesContainer = document.querySelector(".recent-searches");
+  recentSearchesContainer = document.querySelector(".recent-searches");
   const accountAgeDiv = document.querySelector(".account-age");
   const numberOfGamesDiv = document.querySelector(".number-of-games");
   const numberOfBansDiv = document.querySelector(".number-of-bans");
@@ -178,6 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const bottomSectionSection = document.querySelector(".bottom-section");
 
   const darkModeToggle = document.getElementById("darkModeToggle");
+
+  recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+  updateRecentSearchesDisplay(); // Load recent searches from local storage
 
   darkModeToggle.addEventListener("click", function () {
     document.body.classList.toggle("dark-mode");
@@ -279,15 +361,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ----------------------------------------------------------------------------------------
 
-      // Create a new recent search entry
-      const recentSearchItem = document.createElement("div");
-      recentSearchItem.classList.add("recent-search-item");
-      recentSearchItem.innerHTML = `
-        <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
-        <span style="vertical-align: middle;">${personaname}</span>
-      `;
-      // Append the new entry to recent searches (it stays until the page is closed)
-      recentSearchesContainer.appendChild(recentSearchItem);
+        // Create a new recent search entry
+        addRecentSearch(steamId, personaname, avatarFull);
 
     } catch (error) {
       console.error("Error fetching Steam profile:", error);
