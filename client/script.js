@@ -147,9 +147,12 @@ function updateRecentSearchesDisplay() {
 
 function addRecentSearch(steamId, personaname, avatarFull) {
   const newSearch = { steamId, personaname, avatarFull };
-  if (recentSearches.includes(newSearch)) {
-    // If the search already exists, remove it from the array
-    recentSearches = recentSearches.filter(search => search.steamId !== steamId);
+  
+  // Check if the search already exists in the array
+  const existingIndex = recentSearches.findIndex(search => search.steamId === steamId);
+  if (existingIndex !== -1) {
+    // If it exists, remove it from its current position
+    recentSearches.splice(existingIndex, 1);
   }
 
   // Add the new search to the beginning of the array
