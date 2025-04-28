@@ -306,6 +306,14 @@ body {
   transition: opacity 0.3s ease, height 0.3s ease;
 }
 
+.recent-searches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px; 
+  padding-right: 20px;
+}
+
 .recent-search-item {
   cursor: pointer;
 }

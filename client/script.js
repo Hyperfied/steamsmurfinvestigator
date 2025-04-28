@@ -185,7 +185,29 @@ function addRecentSearchDiv(steamId, personaname, avatarFull) {
 }
 
 function updateRecentSearchesDisplay() {
-  recentSearchesContainer.innerHTML = "<div class='recent-searches'>Recent searches</div>"; // Clear previous entries
+  let recentSearchesHeader = document.createElement("div");
+  recentSearchesHeader.classList.add("recent-searches-header");
+
+  let recentSearchesClear = document.createElement("span");
+  recentSearchesClear.textContent = "X";
+  recentSearchesClear.style.cursor = "pointer";
+  recentSearchesClear.addEventListener("click", () => {
+    // Clear recent searches from local storage and the display
+    if (confirm("Are you sure you want to clear recent searches?")) {
+      recentSearches = [];
+      localStorage.removeItem("recentSearches");
+      updateRecentSearchesDisplay();
+    }
+  })
+
+  let recentSearchesTitle = document.createElement("span");
+  recentSearchesTitle.textContent = "Recent Searches";
+
+  recentSearchesHeader.appendChild(recentSearchesTitle);
+  recentSearchesHeader.appendChild(recentSearchesClear);
+
+  recentSearchesContainer.innerHTML = ""; // Clear previous entries
+  recentSearchesContainer.appendChild(recentSearchesHeader); // Add header to the container
   recentSearches.forEach(search => {
     addRecentSearchDiv(search.steamId, search.personaname, search.avatarFull);
   });
