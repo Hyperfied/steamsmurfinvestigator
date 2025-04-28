@@ -306,6 +306,10 @@ body {
   transition: opacity 0.3s ease, height 0.3s ease;
 }
 
+.recent-search-item {
+  cursor: pointer;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .container {

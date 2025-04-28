@@ -235,6 +235,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
           <span style="vertical-align: middle;">${personaname}</span>
         `;
+        recentSearchItem.addEventListener("click", () => {
+          // When clicked, fill the input with the Steam ID and trigger the search
+          searchInput.value = steamId;
+          searchForm.dispatchEvent(new Event("submit", {cancelable: true}));
+
+        });
         // Append the new entry to recent searches (it stays until the page is closed)
         recentSearchesContainer.appendChild(recentSearchItem);
       } else {
