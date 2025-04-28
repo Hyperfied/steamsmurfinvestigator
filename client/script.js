@@ -7,6 +7,53 @@ let recentSearchesContainer = null;
 
 let recentSearches = [];
 
+//
+//
+//
+
+async function getVanityURL(steamid) {
+  const response = await fetch(`${serverURL}/profile/vanityurl/${steamid}`);
+  const data = await response.json();
+  return data.steamid;
+}
+
+async function getSummary(steamid) {
+  const response = await fetch(`${serverURL}/profile/summary/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getFriends(steamid) {
+  const response = await fetch(`${serverURL}/profile/friends/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getBans(steamid) {
+  const response = await fetch(`${serverURL}/profile/bans/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getRecentPlaytime(steamid) {
+  const response = await fetch(`${serverURL}/profile/recent/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getGames(steamid) {
+  const response = await fetch(`${serverURL}/profile/games/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+async function getAccountValue(steamid) {
+  const response = await fetch(`${serverURL}/profile/value/${steamid}`);
+  const data = await response.json();
+  return data;
+}
+
+
 // -----------------------------------------------------
 // Functions to get scores from the API
 // --------------------------------------
@@ -165,6 +212,9 @@ function addRecentSearch(steamId, personaname, avatarFull) {
 
   // Update the recent searches display
   updateRecentSearchesDisplay();
+
+  // Save the recent searches to local storage
+  localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -185,6 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const bottomSectionSection = document.querySelector(".bottom-section");
 
   const darkModeToggle = document.getElementById("darkModeToggle");
+
+  recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+  updateRecentSearchesDisplay(); // Load recent searches from local storage
 
   darkModeToggle.addEventListener("click", function () {
     document.body.classList.toggle("dark-mode");
@@ -288,13 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Create a new recent search entry
         addRecentSearch(steamId, personaname, avatarFull);
-        
-      } else {  
-        messageDiv.textContent = "No player found with this Steam ID.";
-        profileNameDiv.textContent = "Profile Name";
-        profilePictureDiv.textContent = "Profile Picture";
-        messageDiv.style.color = "red";
-      }
+
     } catch (error) {
       console.error("Error fetching Steam profile:", error);
       messageDiv.textContent = "Error fetching Steam profile.";
