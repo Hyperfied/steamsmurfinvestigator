@@ -5,6 +5,8 @@ import server.StatsProcessor as StatsProcessor
 import server.smurfcalculation as smurfcalculation
 import time
 
+# FastAPI app instance
+
 app = FastAPI()
 
 app.add_middleware(
@@ -12,6 +14,8 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_origins=["*"]
 )
+
+# Static Files
 
 @app.get("/")
 async def get_page():
@@ -25,86 +29,86 @@ async def get_style():
 async def get_script():
     return FileResponse("./client/script.js")
 
-@app.get("/profile/{steamid}")
-async def profile(steamid: str):
+# Profile Endpoints
+
+@app.get("/profile/vanityurl/{vanityurl}")
+async def profile_vanityurl(vanityurl: str):
+    steamid = await StatsProcessor.tryVanityURL(vanityurl)
     
-    steamid = await StatsProcessor.tryVanityURL(steamid)
+    response = { "steamid": steamid }
     
+    return response
+
+@app.get("/profile/summary/{steamid}")
+async def profile_summary(steamid: str):
     summary = await StatsProcessor.getPlayerSummary(steamid)
     
-    requestString = f"https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key={StatsProcessor.steamKey}&steamid={steamid}"
-    ageRequest = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={StatsProcessor.steamKey}&steamids={steamid}"
-    
-    requestBanString = f"https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={StatsProcessor.steamKey}&steamids={steamid}"
-    
-    recentRequest = f"https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?key={StatsProcessor.steamKey}&steamid={steamid}"
-    gamesRequest = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={StatsProcessor.steamKey}&steamid={steamid}&include_played_free_games=true"
-    
-    start_time = time.time()
-    
-    current_time = time.time()
-    friendTotal = await StatsProcessor.friendTotal(requestString)
-    print(f"Friend total time: {time.time() - current_time} seconds")
-    
-    current_time = time.time()
-    friendTimestamps = await StatsProcessor.friendTime(requestString)
-    print(f"Friend timestamps time: {time.time() - current_time} seconds")
-    
-    current_time = time.time()
-    accountAgeSeconds = await StatsProcessor.accountAge(ageRequest)
-    print(f"Account age time: {time.time() - current_time} seconds")
-    
-    current_time = time.time()
-    banNumber = await StatsProcessor.getBanNumber(requestBanString)
-    print(f"Ban number time: {time.time() - current_time} seconds")
-    
-    current_time = time.time()
-    currentlyVACBanned = await StatsProcessor.currentlyVACBanned(requestBanString)
-    print(f"Currently VAC banned time: {time.time() - current_time} seconds")
-    
-    current_time = time.time()
-    recentPlayTimeHours = await StatsProcessor.recentPlayTime(recentRequest)
-    print(f"Recent play time time: {time.time() - current_time} seconds")
-    
-    current_time = time.time()
-    numberOfGames = await StatsProcessor.numberOfGames(gamesRequest)
-    print(f"Number of games time: {time.time() - current_time} seconds")
-    
-    totalPlaytimeHours, averagePlaytimeRecentHours = await StatsProcessor.totalPlayTime(gamesRequest)
-    achievementPercentage, totalPossibleAchievements = await StatsProcessor.achievementCompletion(steamid, gamesRequest)
-    
-    accountValue = await StatsProcessor.accountValue(gamesRequest)
-    
-    print(f"Time taken to process: {time.time() - start_time} seconds")
-    
     response = {
-        
         "personaName": StatsProcessor.personaName(summary),
         "realName": StatsProcessor.realName(summary),
         "avatar": StatsProcessor.profilePictureLink(summary),
         "avatarFull": StatsProcessor.profilePictureLinkFull(summary),
         "avatarMedium": StatsProcessor.profilePictureLinkMedium(summary),
-        
-        "friendTotal": friendTotal,
-        "friendTimestamps": friendTimestamps,
-        "accountAgeSeconds": accountAgeSeconds,
-        
-        "banNumber": banNumber,
-        "currentlyVACBanned": currentlyVACBanned,
-        
-        "recentPlayTimeHours": recentPlayTimeHours,
-        "numberOfGames": numberOfGames,
-        "totalPlayTimeHours": totalPlaytimeHours,
-        "averagePlaytimeRecentHours": averagePlaytimeRecentHours,
-        "achievementCompletionPercentage": achievementPercentage,
-        "totalPossibleAchievements": totalPossibleAchievements,
-        "accountValue": accountValue
-                
+        "accountAgeSeconds": StatsProcessor.getAccountAge(summary),
     }
     
     return response
 
+@app.get("/profile/friends/{steamid}")
+async def profile_friends(steamid: str):
+    length, timestamps = await StatsProcessor.getFriendInfo(steamid)
+    
+    response = {
+        "friendTotal": length,
+        "friendTimestamps": timestamps
+    }
+    
+    return response
 
+@app.get("/profile/bans/{steamid}")
+async def profile_bans(steamid: str):
+    numberOfBans, currentlyVACBanned = await StatsProcessor.getBans(steamid)
+    
+    response = {
+        "banNumber": numberOfBans,
+        "currentlyVACBanned": currentlyVACBanned
+    }
+    
+    return response
+
+@app.get("/profile/recent/{steamid}")
+async def profile_recent(steamid: str):
+    recentPlaytime = await StatsProcessor.getRecentPlaytime(steamid)
+    
+    response = { "recentPlaytimeHours": recentPlaytime}
+    
+    return response
+
+@app.get("/profile/games/{steamid}")
+async def profile_games(steamid: str):
+    numOfGames, totalPlayTime, averageRecentPlaytime, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements = await StatsProcessor.getGames(steamid)
+    
+    response = {
+        "numberOfGames": numOfGames,
+        "totalPlaytimeHours": totalPlayTime,
+        "averageRecentPlaytime":  averageRecentPlaytime,
+        "achievementCompletionPercentage": avgAchievementCompletion,
+        "totalCompletedAchievements": totalCompletedAchievements,
+        "totalPossibleAchievements": totalPossibleAchievements
+    }
+    
+    return response
+
+@app.get("/profile/value/{steamid}")
+async def profile_value(steamid: str):
+    accountValue = await StatsProcessor.getAccountValue(steamid)
+    
+    response = { "accountValue": accountValue }
+    
+    return response
+    
+
+# Smurf Calculation Endpoints
 
 @app.get("/smurf/accountAge/{days}")
 async def api_score_account_age(days: float):
