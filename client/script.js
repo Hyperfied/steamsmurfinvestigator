@@ -1,6 +1,12 @@
 
 const serverURL = "http://localhost:8000";
 
+// DOM Elements
+
+let recentSearchesContainer = null;
+
+let recentSearches = [];
+
 // -----------------------------------------------------
 // Functions to get scores from the API
 // -----------------------------------------------------
@@ -114,13 +120,57 @@ function updateSmurfBar(percentage) {
   bottomSection.classList.add("show");
 }
 
+function addRecentSearchDiv(steamId, personaname, avatarFull) {
+  const recentSearchItem = document.createElement("div");
+  recentSearchItem.classList.add("recent-search-item");
+  recentSearchItem.innerHTML = `
+    <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
+    <span style="vertical-align: middle;">${personaname}</span>
+  `;
+  recentSearchItem.addEventListener("click", () => {
+    // When clicked, fill the input with the Steam ID and trigger the search
+    searchInput.value = steamId;
+    searchForm.dispatchEvent(new Event("submit", {cancelable: true}));
+
+  });
+  // Append the new entry to recent searches (it stays until the page is closed)
+  recentSearchesContainer.appendChild(recentSearchItem);
+}
+
+function updateRecentSearchesDisplay() {
+  recentSearchesContainer.innerHTML = "<div class='recent-searches'>Recent searches</div>"; // Clear previous entries
+  recentSearches.forEach(search => {
+    addRecentSearchDiv(search.steamId, search.personaname, search.avatarFull);
+  });
+
+}
+
+function addRecentSearch(steamId, personaname, avatarFull) {
+  const newSearch = { steamId, personaname, avatarFull };
+  if (recentSearches.includes(newSearch)) {
+    // If the search already exists, remove it from the array
+    recentSearches = recentSearches.filter(search => search.steamId !== steamId);
+  }
+
+  // Add the new search to the beginning of the array
+  recentSearches.unshift(newSearch);
+
+  // Limit the number of recent searches to 10
+  if (recentSearches.length > 10) {
+    recentSearches.pop(); // Remove the oldest search
+  }
+
+  // Update the recent searches display
+  updateRecentSearchesDisplay();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("searchForm");
   const searchInput = document.getElementById("searchInput");
   const messageDiv = document.getElementById("message");
   const profileNameDiv = document.querySelector(".profile-name");
   const profilePictureDiv = document.querySelector(".profile-picture");
-  const recentSearchesContainer = document.querySelector(".recent-searches");
+  recentSearchesContainer = document.querySelector(".recent-searches");
   const accountAgeDiv = document.querySelector(".account-age");
   const numberOfGamesDiv = document.querySelector(".number-of-games");
   const numberOfBansDiv = document.querySelector(".number-of-bans");
@@ -229,21 +279,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // ---------------------------------------------------------------
 
         // Create a new recent search entry
-        const recentSearchItem = document.createElement("div");
-        recentSearchItem.classList.add("recent-search-item");
-        recentSearchItem.innerHTML = `
-          <img src="${avatarFull}" alt="${personaname}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
-          <span style="vertical-align: middle;">${personaname}</span>
-        `;
-        recentSearchItem.addEventListener("click", () => {
-          // When clicked, fill the input with the Steam ID and trigger the search
-          searchInput.value = steamId;
-          searchForm.dispatchEvent(new Event("submit", {cancelable: true}));
-
-        });
-        // Append the new entry to recent searches (it stays until the page is closed)
-        recentSearchesContainer.appendChild(recentSearchItem);
-      } else {
+        addRecentSearch(steamId, personaname, avatarFull);
+        
+      } else {  
         messageDiv.textContent = "No player found with this Steam ID.";
         profileNameDiv.textContent = "Profile Name";
         profilePictureDiv.textContent = "Profile Picture";
