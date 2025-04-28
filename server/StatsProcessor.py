@@ -29,7 +29,12 @@ async def getPlayerSummary(steamid):
 
 async def getFriendInfo(steamid):
     requestString = f"https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key={steamKey}&steamid={steamid}"
-    response = requests.get(requestString).json()
+    response = requests.get(requestString)
+    response = response.json()
+    
+    if "friendslist" not in response:
+        print("Error: Unable to retrieve friends list")
+        return 0, []
     
     friendsList = response.get("friendslist").get("friends")
     
