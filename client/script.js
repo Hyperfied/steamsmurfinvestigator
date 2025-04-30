@@ -234,7 +234,7 @@ function addRecentSearch(steamId, personaname, avatarFull) {
   recentSearches.unshift(newSearch);
 
   // Limit the number of recent searches to 10
-  if (recentSearches.length > 10) {
+  if (recentSearches.length > 20) {
     recentSearches.pop(); // Remove the oldest search
   }
 
@@ -392,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // ----------------------------------------------------------------------------------------
 
         // Create a new recent search entry
-        addRecentSearch(steamId, personaname, avatarFull);
+        addRecentSearch(newsteamid, personaname, avatarFull);
 
     } catch (error) {
       console.error("Error fetching Steam profile:", error);
