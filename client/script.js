@@ -12,7 +12,13 @@ let recentSearches = [];
 //
 
 async function getVanityURL(steamid) {
-  const response = await fetch(`${serverURL}/profile/vanityurl/${steamid}`);
+  let substringedSteamId = steamid.split("/").slice(-2, -1)[0];
+  if (substringedSteamId == undefined) {
+    substringedSteamId = steamid;
+  }
+  console.log(substringedSteamId);
+
+  const response = await fetch(`${serverURL}/profile/vanityurl/${substringedSteamId}`);
   const data = await response.json();
   return data.steamid;
 }
