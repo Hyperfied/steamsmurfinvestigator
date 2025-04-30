@@ -169,7 +169,7 @@ def getTop25(gamesResponse):
                 break
     for x in range(25):
         top25names[x] = totalList[x].get("name")
-        top25pictures[x] = totalList[x].get("img_icon_url")
+        top25pictures[x] = f"https://steamcdn-a.akamaihd.net/steam/apps/{totalList[x].get("appid")}/header.jpg"
         top25Playtime[x] = totalList[x].get("playtime_forever") / 60
     return top25names, top25pictures, top25Playtime
             
