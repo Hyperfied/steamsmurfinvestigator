@@ -29,6 +29,10 @@ async def get_style():
 async def get_script():
     return FileResponse("./client/script.js")
 
+@app.get("/client/help.png")
+async def get_help():
+    return FileResponse("./client/help.png")
+
 # Profile Endpoints
 
 @app.get("/profile/vanityurl/{vanityurl}")

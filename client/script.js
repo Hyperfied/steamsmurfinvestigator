@@ -256,7 +256,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const smurfCalcSection = document.querySelector(".smurf-calc");
   const bottomSectionSection = document.querySelector(".bottom-section");
 
+  const helpModal = document.getElementById("helpModal");
+
   const darkModeToggle = document.getElementById("darkModeToggle");
+  const helpButton = document.getElementById("helpButton");
+  const closeModalButton = document.getElementById("closeModal");
 
   recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
   updateRecentSearchesDisplay(); // Load recent searches from local storage
@@ -264,6 +268,16 @@ document.addEventListener("DOMContentLoaded", () => {
   darkModeToggle.addEventListener("click", function () {
     document.body.classList.toggle("dark-mode");
   });
+
+  helpButton.addEventListener("click", function () {
+      helpModal.classList.toggle("hidden");
+  });
+
+  closeModalButton.addEventListener("click", function () {
+      helpModal.classList.toggle("hidden");
+  });
+
+
 
   searchForm.addEventListener("submit", async (event) => {
     event.preventDefault();
