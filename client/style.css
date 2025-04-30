@@ -331,8 +331,9 @@ body {
 }
 
 .modal-content {
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
   border-radius: var(--box-radius);
+  color: var(--text-color);
   padding: 20px;
   width: 80%;
   max-width: 1200px;
