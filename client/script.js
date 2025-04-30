@@ -269,8 +269,18 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     const steamId = searchInput.value.trim();
 
-    // Clear previous messages
+    // Clear previous messages and inputs
     messageDiv.textContent = "";
+    profileNameDiv.textContent = "";
+    profilePictureDiv.innerHTML = "<div class='profile-picture'></div>";
+    accountAgeDiv.textContent = "";
+    numberOfGamesDiv.textContent = "";
+    numberOfBansDiv.textContent = "";
+    totalPlaytimeDiv.textContent = "";
+    totalRecentPlaytimeDiv.textContent = "";
+    numberOfFriendsDiv.textContent = "";
+    averageCompletionOfGamesDiv.textContent = "";
+  
 
     if (!steamId) {
       messageDiv.textContent = "Please enter a Steam ID.";
