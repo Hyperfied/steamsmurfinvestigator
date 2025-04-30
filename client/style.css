@@ -340,12 +340,10 @@ body {
 }
 
 .modal .close {
-  position: absolute;
-  top: 10px;
-  right: 20px;
   font-size: 24px;
   color: var(--text-color);
   cursor: pointer;
+  float: right;
 }
 
 .modal img {
