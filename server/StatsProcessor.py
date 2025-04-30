@@ -144,9 +144,9 @@ def getNumOfGames(gamesResponse):
 def getTop25(gamesResponse):
     top25names = []
     top25pictures = []
-    top25PlayTime = []
+    top25Playtime = []
     for x in range(25):
-        top25PlayTime.append(0)
+        top25Playtime.append(0)
         top25names.append(0)
         top25pictures.append(0)
     gamesList = gamesResponse.get("games")
@@ -170,8 +170,8 @@ def getTop25(gamesResponse):
     for x in range(25):
         top25names[x] = totalList[x].get("name")
         top25pictures[x] = totalList[x].get("img_icon_url")
-        top25PlayTime[x] = totalList[x].get("playtime_forever")
-    return top25names, top25pictures, top25PlayTime
+        top25Playtime[x] = totalList[x].get("playtime_forever") / 60
+    return top25names, top25pictures, top25Playtime
             
 def getTotalPlaytime(gamesResponse):
     playtime_total = 0
