@@ -4,6 +4,7 @@ const serverURL = "http://localhost:8000";
 // DOM Elements
 
 let recentSearchesContainer = null;
+let topGamesContainer = null;
 
 let recentSearches = [];
 
@@ -245,6 +246,31 @@ function addRecentSearch(steamId, personaname, avatarFull) {
   localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
 }
 
+function updateTopGames(top25GameURL, top25GameNames, top25GamePlaytime) {
+  topGamesContainer.innerHTML = "<div class='games-row'><h3></h3><h3>Game</h3><h3>Playtime</h3></div>"; // Clear previous entries
+
+  for (let i = 0; i < top25GameNames.length; i++) {
+    const gameRow = document.createElement("div");
+    gameRow.classList.add("games-row");
+
+    const gameName = document.createElement("h3");
+    gameName.textContent = top25GameNames[i];
+
+    const gamePlaytime = document.createElement("h3");
+    gamePlaytime.textContent = formatHours(top25GamePlaytime[i]);
+
+    const gameImage = document.createElement("img");
+    gameImage.src = top25GameURL[i];
+    gameImage.alt = top25GameNames[i];
+
+    gameRow.appendChild(gameImage);
+    gameRow.appendChild(gameName);
+    gameRow.appendChild(gamePlaytime);
+
+    topGamesContainer.appendChild(gameRow);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("searchForm");
   const searchInput = document.getElementById("searchInput");
@@ -261,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const averageCompletionOfGamesDiv = document.querySelector(".average-completion-of-games");
   const smurfCalcSection = document.querySelector(".smurf-calc");
   const bottomSectionSection = document.querySelector(".bottom-section");
+  topGamesContainer = document.querySelector(".games-table")
 
   const helpModal = document.getElementById("helpModal");
 
@@ -367,6 +394,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalCompletedAchievements = games.totalCompletedAchievements;
       const totalPossibleAchievements = games.totalPossibleAchievements;
 
+      const top25GameNames = games.top25GameNames;
+      const top25GamePlaytime = games.top25Playtime;
+      const top25GameURL = games.top25GameURL;
+
       numberOfGamesDiv.textContent = numberOfGames;
       totalPlaytimeDiv.textContent = formatHours(totalPlaytimeHours);
       averageCompletionOfGamesDiv.textContent = formatPercentage(achievementCompletionPercentage);
@@ -393,6 +424,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Create a new recent search entry
         addRecentSearch(newsteamid, personaname, avatarFull);
+
+        updateTopGames(top25GameURL, top25GameNames, top25GamePlaytime);
 
     } catch (error) {
       console.error("Error fetching Steam profile:", error);

@@ -264,6 +264,44 @@ body {
   overflow: visible;
 }
 
+.games-section {
+  display: flex;
+  gap: 10px;
+  padding: 0;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--accent-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--box-radius);
+  color: var(--text-color);
+}
+
+.games-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  text-align: center;
+  align-items: center;
+  width: 100%;
+}
+
+.games-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.games-row img {
+  width: 200px;
+  border-radius: var(--box-radius);
+}
+
 .smurf-bar {
   flex: 9;
   background: var(--accent-color);
