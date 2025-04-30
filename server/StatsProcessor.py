@@ -72,7 +72,7 @@ async def getRecentPlaytime(steamid):
     return playtime_total_recent / 60
 
 async def getGames(steamid):
-    requestString = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steamKey}&steamid={steamid}&include_played_free_games=true"
+    requestString = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steamKey}&steamid={steamid}&include_played_free_games=true&include_appinfo=true"
     response = requests.get(requestString)
     response = response.json()
     gamesResponse = response.get("response")
@@ -80,8 +80,9 @@ async def getGames(steamid):
     numOfGames = getNumOfGames(gamesResponse)
     totalPlayTime, averagePlaytimeRecent = getTotalPlaytime(gamesResponse)
     avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements = getAchievementCompletion(gamesResponse, steamid)
+    top25names, top25pictureURL, top25PlayTime = getTop25(gamesResponse)
     
-    return numOfGames, totalPlayTime, averagePlaytimeRecent, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements
+    return numOfGames, totalPlayTime, averagePlaytimeRecent, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements, top25names, top25pictureURL, top25PlayTime
     
 async def getAccountValue(steamid):
     
@@ -140,6 +141,38 @@ def getAccountAge(playerSummary):
 def getNumOfGames(gamesResponse):
     return gamesResponse.get("game_count")
 
+def getTop25(gamesResponse):
+    top25names = []
+    top25pictures = []
+    top25PlayTime = []
+    for x in range(25):
+        top25PlayTime.append(0)
+        top25names.append(0)
+        top25pictures.append(0)
+    gamesList = gamesResponse.get("games")
+    temp = top25names[0]
+    totalList = []
+    for x in gamesList:
+        totalList.append(x)
+    sorted = False
+    while sorted == False:
+        for x in range(len(totalList) - 2):
+            if totalList[x].get("playtime_forever") < totalList[x + 1].get("playtime_forever"):
+                temp = totalList[x]
+                totalList[x] = totalList[x + 1]
+                totalList[x + 1] = temp
+        for x in range(len(totalList) - 2):
+            if totalList[x].get("playtime_forever") >= totalList[x + 1].get("playtime_forever"):
+                sorted = True
+            else:
+                sorted = False
+                break
+    for x in range(25):
+        top25names[x] = totalList[x].get("name")
+        top25pictures[x] = totalList[x].get("img_icon_url")
+        top25PlayTime[x] = totalList[x].get("playtime_forever")
+    return top25names, top25pictures, top25PlayTime
+            
 def getTotalPlaytime(gamesResponse):
     playtime_total = 0
     max_average_playtime_possible_recent = 336 * 60 #converting possible playtime to minutes; 336 is from 24 (hours) x 14 (days); 336 needs to be in minutes so * 60

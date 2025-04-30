@@ -90,7 +90,7 @@ async def profile_recent(steamid: str):
 
 @app.get("/profile/games/{steamid}")
 async def profile_games(steamid: str):
-    numOfGames, totalPlayTime, averageRecentPlaytime, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements = await StatsProcessor.getGames(steamid)
+    numOfGames, totalPlayTime, averageRecentPlaytime, avgAchievementCompletion, totalCompletedAchievements, totalPossibleAchievements, top25GameNames, top25PictureURL, top25PlayTime = await StatsProcessor.getGames(steamid)
     
     response = {
         "numberOfGames": numOfGames,
@@ -98,7 +98,10 @@ async def profile_games(steamid: str):
         "averageRecentPlaytime":  averageRecentPlaytime,
         "achievementCompletionPercentage": avgAchievementCompletion,
         "totalCompletedAchievements": totalCompletedAchievements,
-        "totalPossibleAchievements": totalPossibleAchievements
+        "totalPossibleAchievements": totalPossibleAchievements,
+        "top25GameNames" : top25GameNames,
+        "top25GameURL" : top25PictureURL,
+        "top25PlayTime" : top25PlayTime
     }
     
     return response
