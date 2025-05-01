@@ -61,6 +61,16 @@ async function getRecentPlaytime(steamid) {
 async function getGames(steamid) {
   const response = await fetch(`${serverURL}/profile/games/${steamid}`);
   const data = await response.json();
+
+  if (data.numberOfGames == null) {
+    data.numberOfGames = 0; //if no games, set to 0
+  }
+
+  if (!response.ok) { //error validation
+      throw new Error("General error occured while getting games.");
+  }
+
+
   return data;
 }
 
@@ -365,6 +375,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       //removing all previous show classes, to reset fade-in effect
+
+      let showGames = true; // Flag to determine if games should be shown
+
       accountAgeDiv.classList.remove("show");
       numberOfGamesDiv.classList.remove("show");
       numberOfBansDiv.classList.remove("show");
@@ -433,6 +446,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const top25GamePlaytime = games.top25Playtime;
       const top25GameURL = games.top25GameURL;
 
+      if (numberOfGames === 0) {
+        showGames = false;
+      }
+
+
       numberOfGamesDiv.textContent = numberOfGames;
       numberOfGamesDiv.classList.add("show");
       totalPlaytimeDiv.textContent = formatHours(totalPlaytimeHours);
@@ -460,10 +478,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ----------------------------------------------------------------------------------------
 
-        // Create a new recent search entry
-        addRecentSearch(newsteamid, personaname, avatarFull);
+      // Create a new recent search entry
+      addRecentSearch(newsteamid, personaname, avatarFull);
 
+      if (showGames) {
         updateTopGames(top25GameURL, top25GameNames, top25GamePlaytime);
+      }
 
     } catch (error) {
       console.error("Error fetching Steam profile:", error);
