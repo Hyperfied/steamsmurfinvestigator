@@ -4,6 +4,7 @@ const serverURL = "http://localhost:8000";
 // DOM Elements
 
 let recentSearchesContainer = null;
+let topGamesTable = null;
 let topGamesContainer = null;
 
 let recentSearches = [];
@@ -247,27 +248,39 @@ function addRecentSearch(steamId, personaname, avatarFull) {
 }
 
 function updateTopGames(top25GameURL, top25GameNames, top25GamePlaytime) {
-  topGamesContainer.innerHTML = "<div class='games-row'><h3></h3><h3>Game</h3><h3>Playtime</h3></div>"; // Clear previous entries
+  topGamesTable.innerHTML = "<div class='games-row'><div class='games-item'><h3></h3></div><div class='games-item'><h3>Game</h3></div><div class='games-item'><h3>Playtime</h3></div></div>"; // Clear previous entries
 
   for (let i = 0; i < top25GameNames.length; i++) {
     const gameRow = document.createElement("div");
     gameRow.classList.add("games-row");
 
-    const gameName = document.createElement("h3");
+    const nameDiv = document.createElement("div");
+    nameDiv.classList.add("games-item");
+    const gameName = document.createElement("p");
     gameName.textContent = top25GameNames[i];
+    nameDiv.appendChild(gameName);
 
-    const gamePlaytime = document.createElement("h3");
+
+    const gamePlaytimeDiv = document.createElement("div");
+    gamePlaytimeDiv.classList.add("games-item");
+    const gamePlaytime = document.createElement("p");
     gamePlaytime.textContent = formatHours(top25GamePlaytime[i]);
+    gamePlaytimeDiv.appendChild(gamePlaytime);
 
+    const gameImageDiv = document.createElement("div");
+    gameImageDiv.classList.add("games-item");
     const gameImage = document.createElement("img");
     gameImage.src = top25GameURL[i];
     gameImage.alt = top25GameNames[i];
+    gameImageDiv.appendChild(gameImage);
 
-    gameRow.appendChild(gameImage);
-    gameRow.appendChild(gameName);
-    gameRow.appendChild(gamePlaytime);
+    gameRow.appendChild(gameImageDiv);
+    gameRow.appendChild(nameDiv);
+    gameRow.appendChild(gamePlaytimeDiv);
 
-    topGamesContainer.appendChild(gameRow);
+    topGamesTable.appendChild(gameRow);
+
+    topGamesContainer.classList.add("show"); // Add 'show' class to smoothly reveal the section
   }
 }
 
@@ -287,7 +300,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const averageCompletionOfGamesDiv = document.querySelector(".average-completion-of-games");
   const smurfCalcSection = document.querySelector(".smurf-calc");
   const bottomSectionSection = document.querySelector(".bottom-section");
-  topGamesContainer = document.querySelector(".games-table")
+  topGamesContainer = document.querySelector(".games-section");
+  topGamesTable = document.querySelector(".games-table")
 
   const helpModal = document.getElementById("helpModal");
 
@@ -338,6 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add 'show' class to smoothly reveal the section
       smurfCalcSection.classList.add("show");
       bottomSectionSection.classList.add("show");
+      topGamesContainer.classList.remove("show"); // Hide the top games section
     }
 
     try {

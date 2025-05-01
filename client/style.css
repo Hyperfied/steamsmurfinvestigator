@@ -267,7 +267,8 @@ body {
 .games-section {
   display: flex;
   gap: 10px;
-  padding: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
   flex-direction: column;
   text-align: center;
   align-items: center;
@@ -277,6 +278,19 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--box-radius);
   color: var(--text-color);
+
+  /* Initially hidden but keeping layout intact */
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, height 0.3s ease;
+}
+
+/* When active, make it visible */
+.games-section.show {
+  opacity: 1;
+  height: auto;
+  overflow: visible;
 }
 
 .games-table {
@@ -297,8 +311,15 @@ body {
   width: 100%;
 }
 
-.games-row img {
-  width: 200px;
+.games-item {
+  width: 33%;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+
+.games-item img {
+  max-width: 200px;
   border-radius: var(--box-radius);
 }
 
