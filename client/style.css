@@ -241,6 +241,20 @@ body {
   align-items: center;
   background: var(--accent-color);
   min-height: 50px;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show class to trigger fade-in */
+.information-display.show,
+.account-age.show,
+.number-of-games.show,
+.number-of-bans.show,
+.total-playtime.show,
+.total-recent-playtime.show,
+.number-of-friends.show,
+.average-completion-of-games.show {
+  opacity: 1;
 }
 
 /* Bottom section */
