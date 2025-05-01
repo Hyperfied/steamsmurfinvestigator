@@ -145,7 +145,7 @@ async def test_profile_games(mock_getGames):
 @pytest.mark.asyncio
 @patch("server.StatsProcessor.getAccountValue", new_callable=AsyncMock)
 async def test_profile_value(mock_getAccountValue):
-    mock_getAccountValue.return_value = 1683.1800000000005
+    mock_getAccountValue.return_value = 1550.6800000000005
     
     response = client.get("/profile/value/76561198289757367")
     
@@ -153,4 +153,4 @@ async def test_profile_value(mock_getAccountValue):
     
     response_json = response.json()
     
-    assert response_json["accountValue"] == 1683.1800000000005
+    assert response_json["accountValue"] == 1550.6800000000005

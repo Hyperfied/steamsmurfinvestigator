@@ -218,6 +218,7 @@ def getAchievementCompletion(gamesResponse, steamid):
                     total_possible_achievements += total_achievements
 
             # Reset the request string for the next batch of appids
+            print(current_string)
             current_string = request_string
 
     avg_percentage = (completion_percentage / valid_games) if valid_games > 0 else 0 
