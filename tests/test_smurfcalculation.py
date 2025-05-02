@@ -62,6 +62,20 @@ def test_score_total_playtime():
     assert score_total_playtime(300) == 1.552838910217017
     assert score_total_playtime(500) ==  0.007961158534050482
 
+def test_score_last_2_weeks_versus_average():
+    assert score_last_2_weeks_versus_average(300, 100) == 9.9084104685687
+    assert score_last_2_weeks_versus_average(250, 100) == 9.042375264594117
+    assert score_last_2_weeks_versus_average(200, 100) == 7.965036726540319
+    assert score_last_2_weeks_versus_average(175, 100) == 7.324693859771402
+    assert score_last_2_weeks_versus_average(125, 100) == 5.780617100144339
+    assert score_last_2_weeks_versus_average(100, 100) == 4.847507141193219
+    assert score_last_2_weeks_versus_average(80, 100) == 4.0095366400167425
+    assert score_last_2_weeks_versus_average(60, 100) == 3.083616992437021
+    assert score_last_2_weeks_versus_average(40, 100) == 2.070199111532895
+    assert score_last_2_weeks_versus_average(20, 100) == 0.989952735597845
+    assert score_last_2_weeks_versus_average(0, 100) == 0.0
+
+
 def test_score_account_value():
     assert score_account_value(0) == 10.0
     assert score_account_value(5) == 8.796069623601294
@@ -74,4 +88,30 @@ def test_score_account_value():
     assert score_account_value(100) == 2.0467133753703317
     assert score_account_value(150) == 1.1598299530154035
     assert score_account_value(300) == 0.026032479425647993
+
+def test_score_account_friends():
+    assert score_account_friends(1) == 4.934521390236444
+    assert score_account_friends(2) == 4.576528205087243
+    assert score_account_friends(3) == 4.060270684817506
+    assert score_account_friends(4) == 3.4834417924918863
+    assert score_account_friends(5) == 2.9219420428717555
+    assert score_account_friends(6) == 2.4176668563403823
+    assert score_account_friends(7) == 1.9853995598516017
+    assert score_account_friends(8) == 1.6241725421283075
+    assert score_account_friends(10) == 1.0808820948381712
+    assert score_account_friends(15) == 0.36198175002647676
+    assert score_account_friends(20) == 0.05319619664191664
+
+def test_score_average_achievement_percentage():
+    assert score_average_achievement_percentage(0, 100) == 5 # 0%
+    assert score_average_achievement_percentage(2.5, 100) == 4.464887908897771 # 2.5%
+    assert score_average_achievement_percentage(5, 100) == 3.95066377783734 # 5%
+    assert score_average_achievement_percentage(7.5, 100) == 3.501309882142602 # 7.5%
+    assert score_average_achievement_percentage(10, 100) == 3.109812567774419 # 10%
+    assert score_average_achievement_percentage(15, 100) == 2.466762981193581 # 15%
+    assert score_average_achievement_percentage(20, 100) == 1.9645952128344761 # 20%
+    assert score_average_achievement_percentage(25, 100) == 1.5636933843872691 # 25%
+    assert score_average_achievement_percentage(35, 100) == 0.9668502784796786 # 35%
+    assert score_average_achievement_percentage(50, 100) == 0.3793516723543988 # 50%
+    assert score_average_achievement_percentage(60, 100) == 0.10743239306437964 # 60%
 
