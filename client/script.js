@@ -14,13 +14,22 @@ let recentSearches = [];
 //
 
 async function getVanityURL(steamid) {
-  let substringedSteamId = steamid.split("/").slice(-2, -1)[0];
-  if (substringedSteamId == undefined) {
-    substringedSteamId = steamid;
+  let substringedSteamId = steamid.split("/").filter(part => part).pop(); //should be able to handle vanity, trailing slashes, steam64 id
+
+  if (/^\d{17}$/.test(substringedSteamId)) { //skip api call if already 17 digits, as its already a steamid
+    return substringedSteamId;
   }
   console.log(substringedSteamId);
-
   const response = await fetch(`${serverURL}/profile/vanityurl/${substringedSteamId}`);
+
+  if (!response.ok) { //error validation
+    if (response.status === 404 ) {
+      throw new Error("No steam account found; try a different URL."); //should be raised by the endpoint in server.py
+    } else {
+      throw new Error("General error occured while getting SteamID.");
+    }
+  }
+
   const data = await response.json();
   return data.steamid;
 }
@@ -52,6 +61,16 @@ async function getRecentPlaytime(steamid) {
 async function getGames(steamid) {
   const response = await fetch(`${serverURL}/profile/games/${steamid}`);
   const data = await response.json();
+
+  if (data.numberOfGames == null) {
+    data.numberOfGames = 0; //if no games, set to 0
+  }
+
+  if (!response.ok) { //error validation
+      throw new Error("General error occured while getting games.");
+  }
+
+
   return data;
 }
 
@@ -284,6 +303,7 @@ function updateTopGames(top25GameURL, top25GameNames, top25GamePlaytime) {
   }
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("searchForm");
   const searchInput = document.getElementById("searchInput");
@@ -324,8 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
       helpModal.classList.toggle("hidden");
   });
 
-
-
   searchForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const steamId = searchInput.value.trim();
@@ -356,6 +374,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
+      //removing all previous show classes, to reset fade-in effect
+
+      let showGames = true; // Flag to determine if games should be shown
+
+      accountAgeDiv.classList.remove("show");
+      numberOfGamesDiv.classList.remove("show");
+      numberOfBansDiv.classList.remove("show");
+      totalPlaytimeDiv.classList.remove("show");
+      totalRecentPlaytimeDiv.classList.remove("show");
+      numberOfFriendsDiv.classList.remove("show");
+      averageCompletionOfGamesDiv.classList.remove("show");
       const newsteamid = await getVanityURL(steamId);
 
       // Summary Data
@@ -375,6 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.style.color = "green";
 
       accountAgeDiv.textContent = formatAccountAge(accountAgeSeconds);
+      accountAgeDiv.classList.add("show");
 
       // Friends Data
       const friends = await getFriends(newsteamid);
@@ -383,6 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const friendTimestamps = friends.friendTimestamps;
 
       numberOfFriendsDiv.textContent = friendTotal;
+      numberOfFriendsDiv.classList.add("show");
 
       // Bans Data
       const bans = await getBans(newsteamid);
@@ -391,6 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentlyVACBanned = bans.currentlyVACBanned;
 
       numberOfBansDiv.textContent = banNumber;
+      numberOfBansDiv.classList.add("show");
 
       // Recent Playtime Data
       const recentPlaytime = await getRecentPlaytime(newsteamid);
@@ -398,6 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const recentPlaytimeHours = recentPlaytime.recentPlaytimeHours;
 
       totalRecentPlaytimeDiv.textContent = formatHours(recentPlaytimeHours);
+      totalRecentPlaytimeDiv.classList.add("show");
 
       // Games Data
       const games = await getGames(newsteamid);
@@ -413,9 +446,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const top25GamePlaytime = games.top25Playtime;
       const top25GameURL = games.top25GameURL;
 
+      if (numberOfGames === 0) {
+        showGames = false;
+      }
+
+
       numberOfGamesDiv.textContent = numberOfGames;
+      numberOfGamesDiv.classList.add("show");
       totalPlaytimeDiv.textContent = formatHours(totalPlaytimeHours);
+      totalPlaytimeDiv.classList.add("show");
       averageCompletionOfGamesDiv.textContent = formatPercentage(achievementCompletionPercentage);
+      averageCompletionOfGamesDiv.classList.add("show");
 
       // Account Value Data
       const accountValue = await getAccountValue(newsteamid);
@@ -437,14 +478,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ----------------------------------------------------------------------------------------
 
-        // Create a new recent search entry
-        addRecentSearch(newsteamid, personaname, avatarFull);
+      // Create a new recent search entry
+      addRecentSearch(newsteamid, personaname, avatarFull);
 
+      if (showGames) {
         updateTopGames(top25GameURL, top25GameNames, top25GamePlaytime);
+      }
 
     } catch (error) {
       console.error("Error fetching Steam profile:", error);
-      messageDiv.textContent = "Error fetching Steam profile.";
+      messageDiv.textContent = error.message;
       messageDiv.style.color = "red";
     }
 

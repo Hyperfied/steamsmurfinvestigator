@@ -8,19 +8,21 @@ with open("secrets.json", "r") as f:
     steamKey = secrets["steamKey"]
     
 
-    
-async def tryVanityURL(steamid):
+
+async def tryVanityURL(steamid): #might be better to rename the parameter to vanityurl? since we're not passing a real steamid
     request = f"https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key={steamKey}&vanityurl={steamid}"
     response = requests.get(request)
     
     if response.status_code != 200:
         print("Error: Unable to resolve vanity URL")
-        return steamid
+        return None #should return none now, to be used by endpoint
     
-    if response.json().get("response").get("success") == 1:
-        return response.json().get("response").get("steamid")
+    data = response.json().get("response", {}) #simplified this
+    if data.get("success") == 1:
+        return data.get("steamid")
+
     else:
-        return steamid
+        return None
 
 async def getPlayerSummary(steamid):
     requestString = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={steamKey}&steamids={steamid}"
@@ -34,7 +36,7 @@ async def getFriendInfo(steamid):
     
     if "friendslist" not in response:
         print("Error: Unable to retrieve friends list")
-        return 0, []
+        return 0, []    
     
     friendsList = response.get("friendslist").get("friends")
     
@@ -142,14 +144,19 @@ def getNumOfGames(gamesResponse):
     return gamesResponse.get("game_count")
 
 def getTop25(gamesResponse):
+    gamesList = gamesResponse.get("games")
+    
+    if gamesList is None or len(gamesList) == 0:
+        return None, None, None
+    
     top25names = []
     top25pictures = []
     top25Playtime = []
-    for x in range(25):
+    for x in range(min(25, gamesResponse.get("game_count"))):
         top25Playtime.append(0)
         top25names.append(0)
         top25pictures.append(0)
-    gamesList = gamesResponse.get("games")
+    
     temp = top25names[0]
     totalList = []
     for x in gamesList:

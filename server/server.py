@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 import server.StatsProcessor as StatsProcessor
@@ -39,6 +39,8 @@ async def get_help():
 async def profile_vanityurl(vanityurl: str):
     steamid = await StatsProcessor.tryVanityURL(vanityurl)
     
+    if steamid is None:
+        raise HTTPException(status_code=404, detail="No steam account found")
     response = { "steamid": steamid }
     
     return response
@@ -61,7 +63,7 @@ async def profile_summary(steamid: str):
 @app.get("/profile/friends/{steamid}")
 async def profile_friends(steamid: str):
     length, timestamps = await StatsProcessor.getFriendInfo(steamid)
-    
+     
     response = {
         "friendTotal": length,
         "friendTimestamps": timestamps
