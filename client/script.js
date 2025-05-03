@@ -324,10 +324,15 @@ document.addEventListener("DOMContentLoaded", () => {
   topGamesTable = document.querySelector(".games-table")
 
   const helpModal = document.getElementById("helpModal");
+  const closeModal = document.getElementById('closeModal');
 
   const darkModeToggle = document.getElementById("darkModeToggle");
   const helpButton = document.getElementById("helpButton");
   const closeModalButton = document.getElementById("closeModal");
+
+  const infoButton = document.getElementById('infoButton');
+const infoModal = document.getElementById('infoModal');
+const infoClose = document.getElementById('infoClose');
 
   recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
   updateRecentSearchesDisplay(); // Load recent searches from local storage
@@ -337,11 +342,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   helpButton.addEventListener("click", function () {
-      helpModal.classList.toggle("hidden");
+    helpModal.classList.remove('hidden');
+    helpModal.classList.add('show');
   });
 
   closeModalButton.addEventListener("click", function () {
+      helpModal.classList.remove('show');
       helpModal.classList.toggle("hidden");
+  });
+
+  infoButton.addEventListener('click', function () {
+    infoModal.classList.add('show');
+    infoModal.classList.remove('hidden');
+  });
+
+  infoClose.addEventListener('click', function () {
+    infoModal.classList.remove('show');
+    infoModal.classList.add('hidden');
   });
 
   searchForm.addEventListener("submit", async (event) => {

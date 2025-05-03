@@ -54,6 +54,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
 
 /* Search bar styling */
@@ -391,33 +392,62 @@ body {
   cursor: pointer;
 }
 
+.help-button {
+  padding: 10px 15px;
+  background: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--box-radius);
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-color);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.help-button:hover {
+  background: var(--primary-color-hovered);
+  color: var(--text-color-hovered);
+}
+
+
 .modal {
   position: fixed;
-  top: 0;
+  z-index: 1000;
   left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+  display: none; /* hidden by default */
   justify-content: center;
   align-items: center;
 }
 
 .modal-content {
-  background-color: var(--accent-color);
+  background-color: var(--primary-color);
+  padding: 30px;
+  border: 1px solid var(--border-color);
   border-radius: var(--box-radius);
+  width: 90vw;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
   color: var(--text-color);
-  padding: 20px;
-  width: 80%;
-  max-width: 1200px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+
+.modal.show {
+  display: flex;
 }
 
 .modal .close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
   font-size: 24px;
   color: var(--text-color);
   cursor: pointer;
-  float: right;
 }
 
 .modal img {

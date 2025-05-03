@@ -9,6 +9,10 @@
   <body>
     <!-- Header: Contains Search Bar and Dark Mode Toggle -->
     <header class="header">
+      <!-- Info Button -->
+      <button id="infoButton" class="dark-mode-toggle">
+        <b>𝓲</b>
+      </button>
       <!-- Search Bar -->
       <div class="search-bar">
         <form id="searchForm">
@@ -91,11 +95,20 @@
       </div>
     </div>
 
+    <div id="infoModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close" id="infoClose">&times;</span>
+        <h2>Information</h2>
+        <p>We do not store any information of the user apart from their avatar and username.</p>
+        <p>We do not share or sell any information of the user apart from their avatar and username.</p>
+      </div>
+    </div>
+
     <div id="helpModal" class="modal hidden">
       <div class="modal-content">
         <span id="closeModal" class="close">&times;</span>
         <h2>Help</h2>
-        <p>You can find the Steam ID or Custom ID by looking at the user's Steam profile page and looking at the URL.</p>
+        <p>You can find the Steam ID or Custom ID by looking at the user's Steam profile page and checking the URL.</p>
         <img src="./client/help.png" alt="Help Image" />
       </div>
     </div>
