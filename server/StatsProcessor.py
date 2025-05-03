@@ -136,6 +136,8 @@ def profilePictureLinkMedium(playerSummary):
     return playerSummary.get("avatarmedium")
 
 def getAccountAge(playerSummary):
+    if playerSummary.get("timecreated") == None:
+        return 0
     creationTimeStamp = int(playerSummary.get("timecreated"))
     currentTime = int(time.time())
     return currentTime - creationTimeStamp
@@ -152,7 +154,13 @@ def getTop25(gamesResponse):
     top25names = []
     top25pictures = []
     top25Playtime = []
-    for x in range(min(25, gamesResponse.get("game_count"))):
+
+    if len(gamesList) < 25:
+        listLength = len(gamesList)
+    else:
+        listLength = 25
+
+    for x in range(min(listLength, gamesResponse.get("game_count"))):
         top25Playtime.append(0)
         top25names.append(0)
         top25pictures.append(0)
@@ -174,7 +182,7 @@ def getTop25(gamesResponse):
             else:
                 sorted = False
                 break
-    for x in range(25):
+    for x in range(listLength):
         top25names[x] = totalList[x].get("name")
         top25pictures[x] = f"https://steamcdn-a.akamaihd.net/steam/apps/{totalList[x].get("appid")}/header.jpg"
         top25Playtime[x] = totalList[x].get("playtime_forever") / 60
